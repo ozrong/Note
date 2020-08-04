@@ -117,7 +117,8 @@ L_(x)= \begin{cases}
 1,if\quad x\in A \\
 0, otherwise
 \end{cases}
-\tag{1}
+\tag{1}
+
 $$
 即若x为真，则取值为1，否则取值为0.
 
@@ -150,3 +151,5 @@ $$
 上面很多都是个人感觉和推论。不严谨，请勿尽信。欢迎相互讨论共同学习
 
 [原文链接](https://www.zhihu.com/question/43216440/answer/156368711)
+## 测试
+dhkdhlkfhflhl
