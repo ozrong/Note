@@ -1,0 +1,1 @@
+$\frac{r_i-r_{min}}{r_{max}-r_{min}}$
