@@ -4,6 +4,67 @@
 
 **tf.data.Dataset.from_tensor_slices五步加载数据集:**
 
+```python
+#=====准备数据集（原始）=========
+data = np.load('data/test_data.npy').item()
+"""假如数据是这样的：
+data字典 {“user”:[user_Id,user_Id...............],"item":[item_id,item_id,item_id................]。"label":[1,1,1,1,1,0,0,0.......]}
+"""
+
+#=====数据集批量化 =======
+dataset = tf.data.Dataset.from_tensor_slices(data)
+"""
+之后数据会变成：
+    {'user': 0, 'item': 1154, 'label': 1}
+    {'user': 0, 'item': 3005, 'label': 1}
+    {'user': 0, 'item': 2119, 'label': 1}
+    {'user': 0, 'item': 1760, 'label': 1}
+    {'user': 0, 'item': 1631, 'label': 1}
+    {'user': 0, 'item': 260,  'label': 0}
+"""
+
+dataset = dataset.shuffle(10000).batch(256)
+"""	
+打乱，批量化
+
+data可以是nmupy的字典
+  将我们的Dataset变成一个BatchDataset，这样的话，在迭代数据的时候，就可以一次返回  一个batch大小的数据
+
+"""
+#====构造迭代器=====
+"""
+此时dataset有两个属性，分别是output_shapes和output_types。我们将根据这两个属性来构造迭代器，用于迭代数据
+"""
+iterator = tf.data.Iterator.from_structure(dataset.output_types,
+                                           dataset.output_shapes)
+#返回的迭代器没有绑定到特定的数据集
+#迭代器需要初始化
+ sess.run(iterator.make_initializer(dataset))
+ 
+#===== 获取batch大小的数据
+def getBatch():
+    sample = iterator.get_next()
+    print(sample)
+    user = sample['user']
+    item = sample['item']
+    return user,item
+
+#====使用迭代器=====
+#eg：我们这里来计算返回的每个batch中，user和item的平均值：
+users,items = getBatch()
+usersum = tf.reduce_mean(users,axis=-1)
+itemsum = tf.reduce_mean(items,axis=-1)
+
+#====注：迭代器iterator只能往前遍历，如果遍历完之后还调用get_next()的话，会报tf.errors.OutOfRangeError错误，因此需要使用try-catch========
+try:
+    while True:
+        print(sess.run([usersum,itemsum]))
+except tf.errors.OutOfRangeError:
+    print("outOfRange")  
+```
+
+
+
 + Step0: 准备要加载的numpy数据
 + Step1: 使用 tf.data.Dataset.from_tensor_slices() 函数进行加载
 + Step2: 使用 shuffle() 打乱数据
@@ -11,7 +72,7 @@
 + Step4: 使用 batch() 函数设置 batch size 值
 + Step5: 根据需要 使用 repeat() 设置是否循环迭代数据集
 
-shuffle(10000):10000是打乱的次数
+shuffle(10000):每取10000个数据打乱一次
 
 map():预处理，可以传入预处理的方法
 
@@ -369,6 +430,41 @@ name：可选，默认为 None，dropout 层的名称。
 """
 ```
 
+## tf.layers.dense（）
+
+```python
+def dense(
+    inputs, 
+    units,
+    activation=None,
+    use_bias=True,
+    kernel_initializer=None,
+    bias_initializer=init_ops.zeros_initializer(),
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    trainable=True,
+    name=None,
+    reuse=None):
+    """
+    全连接层
+    该层实现操作:  outputs = activation(inputs * kernel + bias)
+    其中‘激活’是作为‘activation’参数传递的激活函数(如果不是‘None’)，‘kernel’是     一个由层创建的权重矩阵，而‘bias’是一个由层创建的偏差向量
+    inputs: Tensor input
+    units：整数或长，维数的输出空间。
+    use_bias: Boolean, whether the layer uses a bias
+     kernel_initializer:权值矩阵的初始化函数。如果“None”(默认)，则使用默认值初始化权重by `tf.compat.v1.get_variable`.
+    bias_initializer: Initializer function for the bias.
+    kernel_regularizer: 权值矩阵的正则化函数。
+    bias_regularizer:偏差的初始化函数
+    activity_regularizer: Regularizer function for the output.
+    """
+```
+
+
+
 ## shape注意事项
 
 [1,2] ----> shape=(2,) 表示一维数组，里面有2个元素
@@ -396,6 +492,77 @@ reduce_mean(input_tensor,
 
 """
 ```
+
+### tf.multiply（）
+
+两个矩阵中对应元素各自相乘。
+
+```python
+import tensorflow as tf  
+ 
+#两个矩阵相乘
+x=tf.constant([[1.0,2.0,3.0],[1.0,2.0,3.0],[1.0,2.0,3.0]])  
+y=tf.constant([[0,0,1.0],[0,0,1.0],[0,0,1.0]])
+#注意这里这里x,y要有相同的数据类型，不然就会因为数据类型不匹配而出错
+z=tf.multiply(x,y)
+ 
+#两个数相乘
+x1=tf.constant(1)
+y1=tf.constant(2)
+#注意这里这里x1,y1要有相同的数据类型，不然就会因为数据类型不匹配而出错
+z1=tf.multiply(x1,y1)
+ 
+#数和矩阵相乘
+x2=tf.constant([[1.0,2.0,3.0],[1.0,2.0,3.0],[1.0,2.0,3.0]])
+y2=tf.constant(2.0)
+#注意这里这里x1,y1要有相同的数据类型，不然就会因为数据类型不匹配而出错
+z2=tf.multiply(x2,y2)
+ 
+with tf.Session() as sess:  
+    print(sess.run(z))
+    print(sess.run(z1))
+    print(sess.run(z2))#这里使用了广播机制
+"""
+output:
+z [[0. 0. 3.]
+ [0. 0. 3.]
+ [0. 0. 3.]]
+ 
+z1 2
+
+z2 [[2. 4. 6.]
+ [2. 4. 6.]
+ [2. 4. 6.]]
+ 
+   
+"""
+```
+
+
+
+## 张量的创建
+
+### tf.concat（）
+
+tensorflow中用来拼接张量的函数tf.concat()，用法:
+
+`tf.concat([tensor1, tensor2, tensor3,...], axis)`
+
+```python
+  t1 = [[1, 2, 3], [4, 5, 6]]
+  t2 = [[7, 8, 9], [10, 11, 12]]
+  tf.concat([t1, t2], 0)  # [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+  tf.concat([t1, t2], 1)  # [[1, 2, 3, 7, 8, 9], [4, 5, 6, 10, 11, 12]]
+ 
+  # tensor t3 with shape [2, 3]
+  # tensor t4 with shape [2, 3]
+  tf.shape(tf.concat([t3, t4], 0))  # [4, 3]
+  tf.shape(tf.concat([t3, t4], 1))  # [2, 6]
+```
+
+
+
+
 
 ## tf.nn.top_k()
 
@@ -485,7 +652,7 @@ output:
 可初始化迭代器允许Dataset中存在占位符，这样可以在数据需要输出的时候，再进行feed操作
 
 ```python
-max_value = tf.placeholder(tf.int64, shape=[])
+max_value = tf.placeholder(tf.int64, shape=[])#占位符
 dataset = tf.data.Dataset.range(max_value)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
