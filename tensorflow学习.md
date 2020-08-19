@@ -1,6 +1,4 @@
-# tensorflow学习
-
-## 加载数据集
+# 1.加载数据集
 
 **tf.data.Dataset.from_tensor_slices五步加载数据集:**
 
@@ -78,7 +76,7 @@ map():预处理，可以传入预处理的方法
 
 batch():数据批量大小 eg:128
 
-## tf.initialize_all_variable()
+# tf.initialize_all_variable()
 
 如果定义了变量就一定要使用这个语句初始化这个变量
 
@@ -90,7 +88,7 @@ a=tf.Variable(tf.ones([3,3]))
 
 
 
-## Session
+Session
 
 这是tensorflow的会话控制，
 
@@ -129,7 +127,7 @@ a=tf.Variable(tf.ones([3,3]))
 
   
 
-## pleaceholder
+# pleaceholder
 
 ```
 input1 = tf.placeholder(tf.float32)
@@ -143,7 +141,7 @@ input1,input2一开始是没有值的要在run的时候喂进来值
 """
 ```
 
-## from_structure()
+# from_structure()
 
 **tensorflow tf.data.Iterator.from_structure()**
 
@@ -275,13 +273,13 @@ else:
 return Iterator(iterator_resource, None, output_types, output_shapes,
                 output_classes)
 ~~~
-## 保存和恢复变量
+# saver = tf.train.Saver()
 
 **saver = tf.train.Saver()**
 
 `tf.train.Saver()`是一个==类==，提供了变量、模型(也称图Graph)的保存和恢复模型方法
 
-TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷积、池化等)都需要operator，保存和恢复操作也不例外。在`tf.train.Saver()`类初始化时，用于保存和恢复的`save`和`restore`, operator会被加入Graph。所以，下列类初始化操作应在搭建Graph时完成
+TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷积、池化等)都需要operator，保存和恢复操作也不例外。在`tf.train.Saver()`==类==初始化时，用于保存和恢复的`save`和`restore`, operator会被加入Graph。所以，下列类初始化操作应在搭建Graph时完成
 
 ```python
  class Saver(object):
@@ -320,7 +318,41 @@ TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷�
         """
 ```
 
-## tf.name_scope
+tensorflow的保存和恢复分为两种：保存和恢复变量，保存和恢复模型
+
+## 保存和恢复变量
+
+TensorFlow会讲变量保存在二进制checkpoint文件中，这类文件会将变量名称映射到张量值
+
+举例说明：保存变量
+
+1. 创建变量
+2. 初始化变量
+3. 实例化`tf.train.Saver()`
+4. 创建Session并保存
+
+```python
+import tensorflow as tf
+#===定义变量 =====
+W = tf.Variable([[1,2,3],[3,4,5,]],dtype=tf.float32)
+b = tf.Variable([[1,2,3]],dtype=tf.float32)
+##====初始化变量=====
+init = tf.initialize_all_variables()
+## =====实例化tf.train.Saver()==============
+saver = tf.train.Saver()
+## =======创建session，保存变量===========
+with tf.Session() as sess:
+    sess.run(init)
+    save_path=saver.save(sess,"data/sava_net.ckpt")
+    """data/sava_net.ckpt 保存的文件路径及名字（保存过后会有4个文件在data中）如下面的图"""
+    print(save_path)
+```
+
+![image-20200819210135633](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20200819210135633.png)
+
+## 保存和恢复模型
+
+# tf.name_scope
 
 + 在某个tf.name_scope()指定的区域中定义的所有对象及各种操作，他们的“name”属性上会增加该命名区的区域名，用以区别对象属于哪个区域；
 + 将不同的对象及操作放在由tf.name_scope()指定的区域中，便于在tensorboard中展示清晰的逻辑关系图，这点在复杂关系图中特别重要。
@@ -356,7 +388,7 @@ c1.name = cgx_name_scope/my_add:0
 """
 ```
 
-## tf.one_hot()
+# tf.one_hot()
 
 ```python
 tf.one_hot(
@@ -403,7 +435,7 @@ tf.one_hot(indices, depth,
  
 ```
 
-##  tf.layers.dropout()
+#  tf.layers.dropout()
 
 就是你在训练的时候想拿掉多少神经元，按比例计算。0就是没有dropout，1就是整个层都没了
 
@@ -430,7 +462,7 @@ name：可选，默认为 None，dropout 层的名称。
 """
 ```
 
-## tf.layers.dense（）
+# tf.layers.dense（）
 
 ```python
 def dense(
@@ -465,7 +497,7 @@ def dense(
 
 
 
-## shape注意事项
+# shape注意事项
 
 [1,2] ----> shape=(2,) 表示一维数组，里面有2个元素
 
@@ -473,9 +505,9 @@ def dense(
 
 ==[[1,2]]----->shape=(1,2) 表示二维数组？？？？？，==
 
-## tensorflow的数学运算
+# tensorflow的数学运算
 
-### reduce_mean()
+## reduce_mean()
 
 ```python
 reduce_mean(input_tensor,
@@ -493,7 +525,7 @@ reduce_mean(input_tensor,
 """
 ```
 
-### tf.multiply（）
+## tf.multiply（）
 
 两个矩阵中对应元素各自相乘。
 
@@ -540,9 +572,9 @@ z2 [[2. 4. 6.]
 
 
 
-## 张量的创建
+# 张量的创建
 
-### tf.concat（）
+## tf.concat（）
 
 tensorflow中用来拼接张量的函数tf.concat()，用法:
 
@@ -564,7 +596,7 @@ tensorflow中用来拼接张量的函数tf.concat()，用法:
 
 
 
-## tf.nn.top_k()
+# tf.nn.top_k()
 
 ```python
 tf.nn.top_k(input, k, name=None)
@@ -594,9 +626,9 @@ TopKV2(values=array([[ 0.98925872,  0.76471106],
 """
 ```
 
-## tf.Dataset
+# tf.Dataset
 
-### 获取数据
+## 获取数据
 
 Dataset是存储Tensor结构的类，它可以保存一批Tensor结构，以供模型来训练或者测试。这里，Tensor结构是自己定义的，可以有多种格式。
 
@@ -616,9 +648,9 @@ print(dataset.output_shapes)  # ==> "{'a': (), 'b': (100,)}"
 1、该接口可以接受一个字典变量。实际上，该接口接受任何Iterator
 2、第一个维度被认为是数据的数量，可以看到，观察数据的shapes的时候，只显示第一维以后的，为什么呢，因为第一维被认为是数据的数量，所以不参与构成shapes
 
-### Dataset的输出方式（迭代器）
+## Dataset的输出方式（迭代器）
 
-#### A.make_one_shot_iterator迭代器
+### A.make_one_shot_iterator迭代器
 
 ```python
 dataset = tf.data.Dataset.from_tensor_slices(np.random.randn(10,3))
@@ -647,7 +679,7 @@ output:
 """
 ```
 
-#### B.make_initializable_iterator 迭代器
+### B.make_initializable_iterator 迭代器
 
 可初始化迭代器允许Dataset中存在占位符，这样可以在数据需要输出的时候，再进行feed操作
 
