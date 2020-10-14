@@ -2,7 +2,11 @@
 
 ## 1.不考虑反射，String类型变量所指向内存空间中的内容是不能被改变的
 
-## String str = new String(“abc”)，“abc”在内存中是怎么分配的？
+## 2.String str = new String(“abc”)，“abc”在内存中是怎么分配的？
+
+答案：堆、字符常量区
+
+**“abc”保存在常量池，str引用的对象保存在堆里，而java7中又把常量池移到了堆中，所以这题题目就不够严谨**
 
 题目考查的为Java中的字符串常量池和JVM运行时数据区的相关概念。
 
@@ -16,7 +20,7 @@ JVM为了减少字符串对象的重复创建，其维护了一个特殊的内�
 
 **实现前提**
 
-字符串常量池实现的前提条件就是Java中String对象是不可变的，这样可以安全保证多个变量共享同一个对象。如果Java中的String对象可变的话，一个引用操作改变了对象的值，那么其他的变量也会受到影响，显然这样是不合理的。
+字符串常量池实现的前提条件就是==Java中String对象是不可变的==，这样可以安全保证多个变量共享同一个对象。如果Java中的String对象可变的话，一个引用操作改变了对象的值，那么其他的变量也会受到影响，显然这样是不合理的。
 
 更详细的关于字符串常量池  http://droidyue.com/blog/2014/12/21/string-literal-pool-in-java/
 
@@ -53,6 +57,29 @@ Java中运行时数据区有一个程序寄存器（又称程序计数器），�
 ​    6.只有一种办法不执行finally块里的语句，那就是调用System.exit(1);方法，即退出java虚拟机。 
 
 ​    **强调：finally块里的语句在try或catch里的人return前执行**
+
+## trowable 的子类 error 和 Exception
+
+链接：https://www.nowcoder.com/questionTerminal/7aa513db3a124bb9bea49cd6fc184c0d
+来源：牛客网
+
+Exception 包括非检查性异常 RuntimeException，  及其子类，即运行时的异常，运行时的异常是代码的BUG，
+
+  和检查性异常，即非运行时异常，程序在编译的时候会发现的异常 如: IOException之类,在处理类似文件流的时候，java强制规定必须处理可能遇到的文件流异常。
+
+  runtimeException是运行时的异常，在运行期间抛出异常的超类，程序可以选择是否try-catch处理。
+
+  其他的检查性异常（非运行时的异常，如IOException），是必须try-catch的，否则程序在编译的时候就会发现错误。
+
+翻译：
+
+a.虚拟机会自己抛出RuntimeException异常 
+
+ b.RuntimeException异常不需要声明抛出或者被捕获 
+
+  c.RuntimeException是Throwable的一个子类，它指示一个合理的应用程序不应该试图捕捉的严重问题（这是错误的）
+
+  d:空指针异常（NullPointException）是 RuntimeException
 
 # 线程
 
@@ -121,3 +148,15 @@ http://www.cnblogs.com/sunada2005/p/3577799.html
 final修饰的类肯定不能被继承,final修饰的方法不能被重载,final修饰的变量不允许被再次赋值
 
 **(错误的final是java中的修饰符，可以修饰类、接口、抽象类、方法和属性)**
+
+# others
+
+## java工具
+
+java,exe是java虚拟机：
+
+javadoc.exe用来制作java文档
+
+jdb.exe是java的调试器：如果编译器返回程序代码的错误，可以用它对程序进行调试
+
+javaprof,exe是剖析工具
