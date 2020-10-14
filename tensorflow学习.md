@@ -1,6 +1,4 @@
-# tensorflow学习
-
-## 加载数据集
+# 1.加载数据集
 
 **tf.data.Dataset.from_tensor_slices五步加载数据集:**
 
@@ -78,7 +76,7 @@ map():预处理，可以传入预处理的方法
 
 batch():数据批量大小 eg:128
 
-## tf.initialize_all_variable()
+# tf.initialize_all_variable()
 
 如果定义了变量就一定要使用这个语句初始化这个变量
 
@@ -90,7 +88,7 @@ a=tf.Variable(tf.ones([3,3]))
 
 
 
-## Session
+Session
 
 这是tensorflow的会话控制，
 
@@ -129,7 +127,7 @@ a=tf.Variable(tf.ones([3,3]))
 
   
 
-## pleaceholder
+# pleaceholder
 
 ```
 input1 = tf.placeholder(tf.float32)
@@ -143,7 +141,7 @@ input1,input2一开始是没有值的要在run的时候喂进来值
 """
 ```
 
-## from_structure()
+# from_structure()
 
 **tensorflow tf.data.Iterator.from_structure()**
 
@@ -275,16 +273,28 @@ else:
 return Iterator(iterator_resource, None, output_types, output_shapes,
                 output_classes)
 ~~~
-## 保存和恢复变量
+# get_checkpoint_state()
+
+```python
+def get_checkpoint_state(checkpoint_dir, latest_filename=None):
+"""
+  Returns:
+    A CheckpointState if the state was available, None
+    otherwise.(如果检查点存在则返会检测点状态，否则返回None)
+""" 
+    
+```
+
+# saver = tf.train.Saver()
 
 **saver = tf.train.Saver()**
 
 `tf.train.Saver()`是一个==类==，提供了变量、模型(也称图Graph)的保存和恢复模型方法
 
-TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷积、池化等)都需要operator，保存和恢复操作也不例外。在`tf.train.Saver()`类初始化时，用于保存和恢复的`save`和`restore`, operator会被加入Graph。所以，下列类初始化操作应在搭建Graph时完成
+TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷积、池化等)都需要operator，保存和恢复操作也不例外。在`tf.train.Saver()`==类==初始化时，用于保存和恢复的`save`和`restore`, operator会被加入Graph。所以，下列类初始化操作应在搭建Graph时完成
 
 ```python
- class Saver(object):
+ class Saver(object):#这个是类
     def __init__(self,
                var_list=None,
                reshape=False,
@@ -320,7 +330,178 @@ TensorFlow是通过构造Graph的方式进行深度学习，任何操作(如卷�
         """
 ```
 
-## tf.name_scope
+实例化了`saver=tf.train.Saver()`使用`saver.save()`这个方法关于save():
+
+```python
+save(
+	sess,  # 必需参数，Session对象
+	save_path,  # 必需参数，存储路径
+	global_step=None,  # 可以是Tensor, Tensor name, 整型数
+	latest_filename=None,  # 协议缓冲文件名，默认为'checkpoint'，不用管
+	meta_graph_suffix='meta',  # 图文件的后缀，默认为'.meta'，不用管
+	write_meta_graph=True,  # 是否保存Graph
+	write_state=True,  # 建议选择默认值True
+	strip_default_attrs=False  # 是否跳过具有默认值的节点
+```
+
+**tensorflow的保存和恢复分为两种：保存和恢复变量，保存和恢复模型**
+
+## 保存和恢复变量
+
+TensorFlow会讲变量保存在二进制checkpoint文件中，这类文件会将变量名称映射到张量值
+
+### 保存变量
+
+1. 创建变量
+2. 初始化变量
+3. 实例化`tf.train.Saver()`返回的是一个类可以理解为对象
+4. 创建Session并保存
+
+```python
+import tensorflow as tf
+#===定义变量 =====
+W = tf.Variable([[1,2,3],[3,4,5,]],dtype=tf.float32)
+b = tf.Variable([[1,2,3]],dtype=tf.float32)
+##====初始化变量=====
+init = tf.initialize_all_variables()
+## =====实例化tf.train.Saver()==============
+saver = tf.train.Saver()
+## =======创建session，保存变量===========
+with tf.Session() as sess:
+    sess.run(init)
+    save_path=saver.save(sess,"data/sava_net.ckpt")
+    """data/sava_net.ckpt 保存的文件路径及名字（保存过后会有4个文件在data中）如下面的图"""
+    print(save_path)
+```
+
+![image-20200819210135633](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20200819210135633.png)
+
+==注意到了没：==并不生成一个save_net.ckpt这样的一个文件，checkpoint保存的是当前网络状态，.meta文件保存的是Graph结构的文件
+
+### **恢复变量**
+
+从checkpoint文件中提取变量值赋给新定义的变量
+
+**注意：**在使用restore恢复变量的时候，不要忘记要定义与之前保存的变量一样的shape和dtype,以及和之前保存是==一样的变量名字==
+
+1. 定义相同名字的变量以及变量的shape,dtype
+2. 实例化`saver=tf.train.Saver()`
+3. 使用`saver.restore()`恢复变量
+
+```python
+import tensorflow as tf
+import numpy as np
+W = tf.Variable(np.arange(6).reshape((2,3)),dtype = tf.float32)
+b = tf.Variable(np.arange(3).reshape((1,3)),dtype = tf.float32)
+#使用restore恢复变量的时候这个变量是不用初始话变量的
+saver = tf.train.Saver()
+with tf.Session() as sess:
+    saver.restore(sess,"data/sava_net.ckpt")
+    print("w:",sess.run(W))
+    print("b:",sess.run(b))
+"""
+output:
+w: [[1. 2. 3.]
+ [3. 4. 5.]]
+b: [[1. 2. 3.]]
+
+"""
+```
+
+### 有选择的保存和恢复
+
+向`tf.train.Saver()`的构造函数传递以下任意内容来轻松指定要保存或加载的名称和变量：
+
++ 1.变量列表(要求变量与变量名之间的一一对应)
++ 2.Python字典，其中，key是要使用的名称，value是要管理的变量(通过键值映射自定义变量与变量名之间的对应关系)
+
+```python
+#假如只保存上述例子中的变量
+W = tf.Variable([[1,2,3],[3,4,5,]],dtype=tf.float32)
+b = tf.Variable([[1,2,3]],dtype=tf.float32)
+init = tf.initialize_all_variables()
+saver = tf.train.Saver([W])
+"""
+或者saver = tf.train.Saver({"W_name":W})
+不过在恢复的使用要使用一样的方式得到saver
+"""
+with tf.Session() as sess:
+    sess.run(init)
+    save_path=saver.save(sess,"data/sava_net.ckpt")
+    print(save_path)
+    
+#=========恢复===========
+W = tf.Variable(np.arange(6).reshape((2,3)),dtype = tf.float32)
+saver = tf.train.Saver()
+with tf.Session() as sess:
+    saver.restore(sess,"data/sava_net.ckpt")
+    print("w:",sess.run(W))
+```
+
+### 查看ckpt二进制文件中的变量
+
+我们可以使用 [inspect_checkpoint](https://www.github.com/tensorflow/tensorflow/blob/r1.6/tensorflow/python/tools/inspect_checkpoint.py) 库的`print_tensors_in_checkpoint_file()`快速检查某个检查点的变量。
+
+```python
+def print_tensors_in_checkpoint_file(file_name, tensor_name, all_tensors,
+                                     all_tensor_names=False,
+                                     count_exclude_pattern="")
+"""
+如果没有提供' tensor_name '，则在检查点文件中打印张量名称和形状。如果提供了' tensor_name '，则打印张量的内容。
+file_name:检查点文件的名称。
+tensor_name:要打印的检查点文件中张量的名称。
+all_tensors:指示是否打印所有张量的布尔值。如果是False就打印指定的变量
+all_tensor_names:布尔值，指示是否打印所有张量名称。如果是Ture就打打印所有的变量名
+count_exclude_pattern:正则表达式字符串，计数时排除张量的模式。
+"""    
+```
+
+例子：
+
+```python
+# 保存多一点的变量
+W = tf.Variable([[1,2,3],[3,4,5,]],dtype=tf.float32)
+b = tf.Variable([[1,2,3]],dtype=tf.float32)
+c = tf.Variable([[7,8,9]],dtype=tf.float32)
+init = tf.initialize_all_variables()
+#saver = tf.train.Saver([W])
+saver = tf.train.Saver({"W_name":W,"b_name":b,"c_name":c})
+with tf.Session() as sess:
+    sess.run(init)
+    save_path=saver.save(sess,"data/sava_net.ckpt")
+    print(save_path)
+#=========读取检查点的变量=======================
+from tensorflow.python.tools import inspect_checkpoint as ickpt
+ickpt.print_tensors_in_checkpoint_file("data/sava_net.ckpt", tensor_name="W_name", all_tensors=False)
+#注意如果之前是用字典保存的变量，那么tensor_name="W_name"是字典的Key
+
+"""
+tensor_name:  W_name
+[[1. 2. 3.]
+ [3. 4. 5.]]
+# Total number of params: 12
+"""
+ickpt.print_tensors_in_checkpoint_file("data/sava_net.ckpt", tensor_name="", all_tensors=True)
+#all_tensors=True的话，tensor_name=""
+"""
+tensor_name:  W_name
+[[1. 2. 3.]
+ [3. 4. 5.]]
+tensor_name:  b_name
+[[1. 2. 3.]]
+tensor_name:  c_name
+[[7. 8. 9.]]
+# Total number of params: 12
+"""
+```
+
+**注意：**`W = tf.Variable([[1,2,3],[3,4,5,]],dtype=tf.float32,name="W")`如果在定义变量的时候没有定义name的话，这个变量在ckpt二进制文件中，这个变量名是不会叫W的而是叫Variable（定义的第一个叫Variable，第二个叫Variable_1）
+
+`saver = tf.train.Saver({"W_name":W,"b_name":b,"c_name":c})`使用这个方式就相当于使用name这个参数
+
+## 保存和恢复模型
+
+# tf.name_scope
 
 + 在某个tf.name_scope()指定的区域中定义的所有对象及各种操作，他们的“name”属性上会增加该命名区的区域名，用以区别对象属于哪个区域；
 + 将不同的对象及操作放在由tf.name_scope()指定的区域中，便于在tensorboard中展示清晰的逻辑关系图，这点在复杂关系图中特别重要。
@@ -356,7 +537,7 @@ c1.name = cgx_name_scope/my_add:0
 """
 ```
 
-## tf.one_hot()
+# tf.one_hot()
 
 ```python
 tf.one_hot(
@@ -403,7 +584,7 @@ tf.one_hot(indices, depth,
  
 ```
 
-##  tf.layers.dropout()
+#  tf.layers.dropout()
 
 就是你在训练的时候想拿掉多少神经元，按比例计算。0就是没有dropout，1就是整个层都没了
 
@@ -430,7 +611,7 @@ name：可选，默认为 None，dropout 层的名称。
 """
 ```
 
-## tf.layers.dense（）
+# tf.layers.dense（）
 
 ```python
 def dense(
@@ -463,9 +644,28 @@ def dense(
     """
 ```
 
+# tf.clip_by_value()
+
+`tf.clip_by_value(A, min, max)`：输入一个张量A，把A中的每一个元素的值都压缩在min和max之间。
+ 小于min的让它等于min，大于max的元素的值等于max。
+
+```python
+import tensorflow as tf;  
+import numpy as np;  
+  
+A = np.array([[1,1,2,4], [3,4,8,5]])  
+  
+with tf.Session() as sess:  
+    print sess.run(tf.clip_by_value(A, 2, 5))  
+"""
+[[2 2 2 4]
+ [3 4 5 5]]
+"""
+```
 
 
-## shape注意事项
+
+# shape注意事项
 
 [1,2] ----> shape=(2,) 表示一维数组，里面有2个元素
 
@@ -473,9 +673,16 @@ def dense(
 
 ==[[1,2]]----->shape=(1,2) 表示二维数组？？？？？，==
 
-## tensorflow的数学运算
+```
+tf.reshape(input,[-1])
+"""
+input是输入的数据，shape=[-1]就是不管input里面是什么把它变为1维的（也就是平铺）
+"""
+```
 
-### reduce_mean()
+# tensorflow的数学运算
+
+## reduce_mean()
 
 ```python
 reduce_mean(input_tensor,
@@ -493,7 +700,7 @@ reduce_mean(input_tensor,
 """
 ```
 
-### tf.multiply（）
+## tf.multiply（）
 
 两个矩阵中对应元素各自相乘。
 
@@ -540,9 +747,9 @@ z2 [[2. 4. 6.]
 
 
 
-## 张量的创建
+# 张量的创建
 
-### tf.concat（）
+## tf.concat（）
 
 tensorflow中用来拼接张量的函数tf.concat()，用法:
 
@@ -562,9 +769,30 @@ tensorflow中用来拼接张量的函数tf.concat()，用法:
 
 
 
+# tensorflow网络中变量的创建
+
+通过tf.get_variables()和tf.Variable()来创建变量是等价的。
+
+```python
+#等价的两种形式
+v = tf.get_variable('v',shape=[1],initializer=tf.constant_initializer(1.0))
+v1 = tf.Variable(tf.constant(1.0,shape=[1],name='v')
+"""
+tf.constant_initializer，将变量转化为指定常量
+tf.random_normalni_initializer，将变量初始化为指定的正态分布随机值
+tf.truncated_normal_initializer，截断正态分布，如果随机值偏离平均值超过2个标准差
+那么那个数将重新随机
+tf.random_unitform_initializer，指定的均匀分布随机值
+tf.unitform_unit_scaling_initializer，满足均匀分布但不影响输出数量级的随机值
+tf.zeros_initializer，零矩阵
+tf.ones_initializer，全为1的矩阵
+"""
+                
+```
 
 
-## tf.nn.top_k()
+
+# tf.nn.top_k()
 
 ```python
 tf.nn.top_k(input, k, name=None)
@@ -577,26 +805,29 @@ name: 为这个操作取个名字
 eg:
 input = tf.constant(np.random.rand(3,4))
 k = 2
-output = tf.nn.top_k(input, k)
+output,index = tf.nn.top_k(input, k)
+#返回两个值，一个是top_n,以及对应的索引
 with tf.Session() as sess:
     print(sess.run(input))
-    print(sess.run(output))
+    print("top_n",sess.run(output))
+    print("index",sess.run(index))
 """
 output:
-[[ 0.98925872  0.15743092  0.76471106  0.5949957 ]
- [ 0.95766488  0.67846336  0.21058844  0.2644312 ]
- [ 0.65531991  0.61445187  0.65372938  0.88111084]]
-TopKV2(values=array([[ 0.98925872,  0.76471106],
-       [ 0.95766488,  0.67846336],
-       [ 0.88111084,  0.65531991]]), indices=array([[0, 2],
-       [0, 1],
-       [3, 0]]))
+[[0.29536964 0.62599181 0.37655239 0.17030019]
+ [0.7591839  0.55712539 0.66615823 0.41752363]
+ [0.24750249 0.71353945 0.72818269 0.79565611]]
+top_n [[0.62599181 0.37655239]
+ [0.7591839  0.66615823]
+ [0.79565611 0.72818269]]
+index [[1 2]
+ [0 2]
+ [3 2]]
 """
 ```
 
-## tf.Dataset
+# tf.Dataset
 
-### 获取数据
+## 获取数据
 
 Dataset是存储Tensor结构的类，它可以保存一批Tensor结构，以供模型来训练或者测试。这里，Tensor结构是自己定义的，可以有多种格式。
 
@@ -605,20 +836,28 @@ Dataset是存储Tensor结构的类，它可以保存一批Tensor结构，以供�
 这个接口允许我们传递一个或多个Tensor结构给Dataset，因为默认把Tensor的第一个维度作为数据数目的标识，所以要保持数据结构中第一维的一致性.eg:
 
 ```python
-dataset = tf.data.Dataset.from_tensor_slices(
-   {"a": tf.random_uniform([4]),
-    "b": tf.random_uniform([4, 100], maxval=100, dtype=tf.int32)})
-print(dataset.output_types)  # ==> "{'a': tf.float32, 'b': tf.int32}"
-print(dataset.output_shapes)  # ==> "{'a': (), 'b': (100,)}"
+dataset = tf.data.Dataset.from_tensor_slices(data)
+"""
+加入传入的数据是一个字典
+{“user”:[user_Id,user_Id...............],"item":[item_id,item_id,item_id................],"label":[1,1,1,1,1,0,0,0.......]}
+
+    from_tensor_slices让它变成了:
+    {'user': 0, 'item': 1154, 'label': 1}
+    {'user': 0, 'item': 3005, 'label': 1}
+    {'user': 0, 'item': 2119, 'label': 1}
+    {'user': 0, 'item': 1760, 'label': 1}
+    {'user': 0, 'item': 1631, 'label': 1}
+    {'user': 0, 'item': 260,  'label':  0}
+"""
 ```
 
 这里包含如下信息：
 1、该接口可以接受一个字典变量。实际上，该接口接受任何Iterator
 2、第一个维度被认为是数据的数量，可以看到，观察数据的shapes的时候，只显示第一维以后的，为什么呢，因为第一维被认为是数据的数量，所以不参与构成shapes
 
-### Dataset的输出方式（迭代器）
+## Dataset的输出方式（迭代器）
 
-#### A.make_one_shot_iterator迭代器
+### A.make_one_shot_iterator迭代器
 
 ```python
 dataset = tf.data.Dataset.from_tensor_slices(np.random.randn(10,3))
@@ -647,7 +886,7 @@ output:
 """
 ```
 
-#### B.make_initializable_iterator 迭代器
+### B.make_initializable_iterator 迭代器
 
 可初始化迭代器允许Dataset中存在占位符，这样可以在数据需要输出的时候，再进行feed操作
 
@@ -670,4 +909,10 @@ with tf.Session() as sess:
       value = sess.run(next_element)
       assert i == value
 ```
+
+# tensorflow可视化
+
+`tensorflow`的可视化是使用`summary`和`tensorboard`合作完成的
+
+==注意：sunmary也是一种操作（op）==
 
