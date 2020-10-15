@@ -35,3 +35,10 @@ Parameters
     
 ```
 
+# np.random.permutation（）
+
+随机排列序列
+
+eg:
+
+![img](https://img-blog.csdnimg.cn/20190626164815324.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDE4ODI2NA==,size_16,color_FFFFFF,t_70)

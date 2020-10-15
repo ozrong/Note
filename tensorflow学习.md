@@ -501,6 +501,96 @@ tensor_name:  c_name
 
 ## 保存和恢复模型
 
+保存模型就是上面的保存参数（模型就是一些参数）
+
+上面的只是读取参数（.meta文件保存的是模型的图结构）
+
+要使用训练好的模型就需要恢复模型的图结构和参数才能使用训练好的模型
+
+eg:
+
+```python
+  =================保存之前的模型===================================================
+    假设模型是这样的
+    def add_placeholders(self): 定义的输入
+        self.user = tf.placeholder(tf.int32,name="userid")
+        self.item = tf.placeholder(tf.int32,name="itemid")
+        self.rate = tf.placeholder(tf.float32,name='rate')
+        self.drop = tf.placeholder(tf.float32,name="drop")
+    
+    
+    def add_model(self):
+        user_input = tf.nn.embedding_lookup(self.user_item_embedding, self.user)
+        item_input = tf.nn.embedding_lookup(self.item_user_embedding, self.item)
+
+        def init_variable(shape, name):
+            return tf.Variable(tf.truncated_normal(shape=shape, dtype=tf.float32, stddev=0.01), name=name)
+
+        with tf.name_scope("User_Layer"):
+            user_W1 = init_variable([self.shape[1], self.userLayer[0]], "user_W1")
+            user_out = tf.matmul(user_input, user_W1)
+            for i in range(0, len(self.userLayer)-1):
+                W = init_variable([self.userLayer[i], self.userLayer[i+1]], "user_W"+str(i+2))
+                b = init_variable([self.userLayer[i+1]], "user_b"+str(i+2))
+                user_out = tf.nn.relu(tf.add(tf.matmul(user_out, W), b),name='user_out'+str(i+2))
+                print('user_out'+str(i+2))
+
+                with tf.name_scope("Item_Layer"):
+                    item_W1 = init_variable([self.shape[0], self.itemLayer[0]], "item_W1")
+                    item_out = tf.matmul(item_input, item_W1)
+                    for i in range(0, len(self.itemLayer)-1):
+                        W = init_variable([self.itemLayer[i], self.itemLayer[i+1]], "item_W"+str(i+2))
+                        b = init_variable([self.itemLayer[i+1]], "item_b"+str(i+2))
+                        item_out = tf.nn.relu(tf.add(tf.matmul(item_out, W), b),name='item_out'+str(i+2))
+                        print('item_out' + str(i+2))
+                        # tf.add_to_collection("user_vector",user_out)
+                        # tf.add_to_collection("item_vector",item_out)
+                        norm_user_output = tf.sqrt(tf.reduce_sum(tf.square(user_out), axis=1))
+                        norm_item_output = tf.sqrt(tf.reduce_sum(tf.square(item_out), axis=1))
+                        self.y_ = tf.reduce_sum(tf.multiply(user_out, item_out), axis=1, keep_dims=False) / (norm_item_output* norm_user_output)
+                        tf.add_to_collection("prediction_rate", self.y_)
+                        self.y_ = tf.maximum(1e-6, self.y_,name='y')
+
+        
+========================恢复模型==================================
+with tf.Session(config=config) as sess:   先定义Session()
+    saver = tf.train.import_meta_graph('./checkPoint/model.ckpt.meta') 恢复图结构
+    saver.restore(sess,tf.train.latest_checkpoint('./checkPoint/'))    恢复模型参数
+    graph = tf.get_default_graph()
+    
+    ----------------这个是定义feed_dict对应的参数（输入）
+    userid =graph.get_tensor_by_name("userid:0") #2
+    itemid =graph.get_tensor_by_name("itemid:0") #3035
+    rate = graph.get_tensor_by_name("rate:0")#4
+    drop = graph.get_tensor_by_name("drop:0")
+    
+    feed_dict={userid:[2],itemid:[3035],rate:[4],drop:None}定义输入
+    
+    --------------获取模型中的tensor (就是你想要的tensor 或是操作)
+    item_vector = graph.get_tensor_by_name("User_Layer/user_out2:0")
+    """
+    注意在模型中这个user_out2这个名字是在with tf.name_scope("User_Layer")语句之下的，所以使用这个名字开获取这个操作（tensor）必须加上         
+    User_Layer（"User_Layer/user_out2:0"）
+    """
+    user_vector = graph.get_tensor_by_name("Item_Layer/item_out2:0")
+    y = graph.get_tensor_by_name("y:0")
+    
+    =============运行==================
+
+    print(sess.run(user_vector,feed_dict))
+    print(sess.run(item_vector,feed_dict))
+    print(sess.run(y,feed_dict))
+
+    
+
+```
+
+
+
+
+
+
+
 # tf.name_scope
 
 + 在某个tf.name_scope()指定的区域中定义的所有对象及各种操作，他们的“name”属性上会增加该命名区的区域名，用以区别对象属于哪个区域；
@@ -662,6 +752,32 @@ with tf.Session() as sess:
  [3 4 5 5]]
 """
 ```
+
+# tf.nn.embedding_lookup()
+
+```python
+def embedding_lookup(
+    params,
+    ids,
+    partition_strategy="mod",
+    name=None,
+    validate_indices=True,  # pylint: disable=unused-argument
+    max_norm=None):
+params:可以是张量也可以是数组等 
+id:就是对应的索引
+ 功能：主要是选取一个张量里面索引对应的元素
+    
+```
+
+# tf.einsum()
+
+要了解输出数组的计算方法，请记住以下三个规则：
+
+- 在输入数组中重复的字母意味着值沿这些轴相乘。乘积结果为输出数组的值。
+
+- 输出中省略的字母意味着沿该轴的值将相加。
+
+- 我们可以按照我们喜欢的任何顺序返回未没进行累加的轴。
 
 
 
@@ -916,3 +1032,176 @@ with tf.Session() as sess:
 
 ==注意：sunmary也是一种操作（op）==
 
+# 正则化
+
+以全连接层为例
+
+```python
+tf.layers.dense(
+    inputs,                                      输入张量
+    units,                                       输出节点数，也就是说经过这层全连接后，输入张量的维度会变成units
+    activation=None,                             激活函数
+    use_bias=True,                               是否使用偏置，默认为是
+    kernel_initializer=None,                     权重初始化方式，其取值可以是如下
+                                                 tf.constant_initializer
+                                                 tf.glorot_normal_initializer
+                                                 tf.glorot_uniform_initializer
+                                                 tf.truncated_normal_initializer
+    
+    bias_initializer=tf.zeros_initializer(), 
+    kernel_regularizer=None,                     权重的正则化方式
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    trainable=True,
+    name=None,
+    reuse=None
+)
+```
+
+eg:::
+
+```python
+x = tf.Variable(tf.constant([[1, 2, 3], [4, 5, 6]], dtype=tf.float32))
+weight = np.array([1, 1, 1, 0, 2, 1.]).reshape(3, 2)
+fc = tf.layers.dense(x, units=2, activation=tf.nn.relu,
+                     kernel_initializer=tf.constant_initializer(value=weight),
+                     kernel_regularizer=tf.keras.regularizers.l2(0.1)) #l2正则
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    f = sess.run(fc)
+    print(f)  
+[[ 9.  4.]
+ [21. 10.]]
+```
+
+如上代码所示为实现一个全连接层的方法，同时为了对其结果进行验证在这里我们使用了常数初始化方法来初始化内部的权重矩阵。也就是说此处的`tf.layers.dense()`完成了如下的一个矩阵乘法操作：
+
+![image-20201014194223746](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201014194223746.png)
+
+**正则化**
+
+从上面的示例代码中可以看到，其实我们已经对权重参数`weight`施加了一`l2`个正则化。同时，如果按照预期的话，权重正则化后的应该是：
+
+![image-20201014194304717](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201014194304717.png)
+
+但在Tensorflow中这个结果我们应该如何得到呢？在Tensorflow中，我们可以通过这么一个方法来获得施加正则化后的结果：`tf.losses.get_regularization_loss()`。
+
+同时，如果稍加注意的话你会发现Tensorflow还提供了`tf.losses.get_regularization_losses()`这么一个方法。那这个方法又来干啥的呢？在一个复杂的网络中，如果你对很多参数都进行了正则化，那么这个复数形式的方法返回的就是一个列表，列表中的每个元素均为某个权重参数正则化后的结果（每一个参数的正则化但是并没有求和），例如上述代码采用这个方法返回的结果则为`[0.8]`。而**不带复数形式的方法返回的就是所有权重参数正则化后的累加和**
+
+# 权重初始化
+
+```
+1.tf.constant_initializer() # 常数初始化
+2.tf.ones_initializer() # 全1初始化
+3.tf.zeros_initializer() # 全0初始化
+4.tf.random_uniform_initializer() # 均匀分布初始化
+5.tf.random_normal_initializer() # 正态分布初始化
+6.tf.truncated_normal_initializer() # 截断正态分布初始化
+7.tf.uniform_unit_scaling_initializer() # 这种方法输入方差是常数
+8.tf.variance_scaling_initializer() # 自适应初始化
+9.tf.orthogonal_initializer() # 生成正交矩阵
+10.tf.glorot_uniform_initializer() # 初始化为与输入输出节点数相关的均匀分布随机数
+11.tf.glorot_normal_initializer() # 初始化为与输入输出节点数相关的截断正太分布随机数
+```
+
+## tf.constant_initializer()
+
+也可以简写为tf.Constant()
+
+初始化为常数，这个非常有用，通常偏置项就是用它初始化的。
+
+由它衍生出的两个初始化方法：
+
+a、 tf.zeros_initializer()， 也可以简写为tf.Zeros()
+
+b、tf.ones_initializer(), 也可以简写为tf.Ones()
+
+```python
+ bias_initializer=tf.constant_initializer(0) 初始化为0
+=bias_initializer=tf.zeros_initializer()
+=bias_initializer=tf.Zeros()
+```
+
+## tf.truncated_normal_initializer()
+
+或者简写为tf.TruncatedNormal()
+
+生成截断正态分布的随机数，这个初始化方法好像在tf中用得比较多
+
+它有四个参数（mean=0.0, stddev=1.0, seed=None, dtype=dtypes.float32)，分别用于指定均值、标准差、随机数种子和随机数的数据类型，一般只需要设置stddev这一个参数就可以了
+
+## tf.random_normal_initializer()
+
+可简写为 tf.RandomNormal()
+
+生成标准正态分布的随机数，参数和truncated_normal_initializer一样
+
+## random_uniform_initializer
+
+可简写为tf.RandomUniform()
+
+生成均匀分布的随机数，参数有四个（minval=0, maxval=None, seed=None, dtype=dtypes.float32)，分别用于指定最小值，最大值，随机数种子和类型
+
+## tf.uniform_unit_scaling_initializer()
+
+可简写为tf.UniformUnitScaling()
+
+和均匀分布差不多，只是这个初始化方法不需要指定最小最大值，是通过计算出来的。参数为（factor=1.0, seed=None, dtype=dtypes.float32)
+
+```
+max_val = math.sqrt(3 / input_size) * factor    
+这里的input_size是指输入数据的维数，假设输入为x, 运算为x * W，则input_size= W.shape[0]
+它的分布区间为[ -max_val, max_val]
+```
+
+## tf.variance_scaling_initializer()
+
+可简写为tf.VarianceScaling()
+
+参数为（scale=1.0,mode="fan_in",distribution="normal",seed=None，dtype=dtypes.float32)
+
+scale: 缩放尺度（正浮点数）
+
+mode: "fan_in", "fan_out", "fan_avg"中的一个，用于计算标准差stddev的值。
+
+distribution：分布类型，"normal"或“uniform"中的一个。
+
+当 distribution="normal" 的时候，生成truncated normal  distribution（截断正态分布） 的随机数，其中stddev = sqrt(scale / n) ，n的计算与mode参数有关。
+
+   如果mode = "fan_in"， n为输入单元的结点数；     
+
+   如果mode = "fan_out"，n为输出单元的结点数；
+
+​    如果mode = "fan_avg",n为输入和输出单元结点数的平均值。
+
+当distribution="uniform”的时候 ，生成均匀分布的随机数，假设分布区间为[-limit, limit]，则
+
+   limit = sqrt(3 * scale / n)
+
+## tf.orthogonal_initializer()
+
+简写为tf.Orthogonal()
+
+生成正交矩阵的随机数。
+
+当需要生成的参数是2维时，这个正交矩阵是由均匀分布的随机数矩阵经过SVD分解而来。
+
+## tf.glorot_uniform_initializer()
+
+也称之为**Xavier uniform initializer**，由一个均匀分布（uniform distribution)来初始化数据。
+
+假设均匀分布的区间是[-limit, limit],则
+
+limit=sqrt(6 / (fan_in + fan_out))
+
+其中的fan_in和fan_out分别表示输入单元的结点数和输出单元的结点数。
+
+## glorot_normal_initializer()
+
+也称之为 **Xavier normal initializer**. 由一个 truncated normal distribution来初始化数据.
+
+stddev = sqrt(2 / (fan_in + fan_out))
+
+其中的fan_in和fan_out分别表示输入单元的结点数和输出单元的结点数。

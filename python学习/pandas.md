@@ -193,3 +193,208 @@ full_data = pd.read_csv(DATA_DIR,sep='::',header=None,names=['user','item'],
 """
 ```
 
+# DataFrame.drop()
+
+根据指定索引标签删除序列中的元素。使用多索引时，可以删除不同级别的标签通过指定级别。
+
+```python
+    def drop(
+        labels=None,
+        axis=0,
+        index=None,
+        columns=None,
+        level=None,
+        inplace=False,
+        errors="raise",
+    )
+    labels:单标签或列表(要删除的索引标签)
+    axis:
+    labels,axis两者组合使用，删除对应的axis中对应的那个标签
+    columns： columns=["","",....]删除对应标签的列
+     index：index=["","",....]删除对应标签的行
+        
+eg:假如以下数据    
+           one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+-------------------------------
+print(data.drop(labels="one"))将会报错，应为axis默认为0，而在这个维度（也就是第一列）没有“one”标签
+-------------------------------
+print(data.drop(labels="one",axis=1))
+           two  three  four
+Ohio        1      2     3
+Colorado    5      6     7
+Utah        9     10    11
+New York   13     14    15
+-------------------------------
+print(data.drop(columns=['one',"two"]))
+           three  four
+Ohio          2     3
+Colorado      6     7
+Utah         10    11
+New York     14    15
+-------------------------------
+print(data.drop(index=['Ohio',"Colorado"]))
+          one  two  three  four
+Utah        8    9     10    11
+New York   12   13     14    15
+-------------------------------
+print(data.drop(index=['Ohio',"Colorado"],columns=['two']))
+          one  three  four
+Utah        8     10    11
+New York   12     14    15
+
+
+
+    
+```
+
+# pd.cut()
+
+```python
+def cut(
+    x,
+    bins,
+    right: bool = True,
+    labels=None,
+    retbins: bool = False,
+    precision: int = 3,
+    include_lowest: bool = False,
+    duplicates: str = "raise",
+    ordered: bool = True,
+)
+x ： 一维数组
+bins ：整数，标量序列或者间隔索引，是进行分组的依据，
+	如果填入整数n，则表示将x中的数值分成等宽的n份（即每一组内的最大值与最小值之差约相等）；
+	如果是标量序列，序列中的数值表示用来分档的分界值
+	如果是间隔索引，“ bins”的间隔索引必须不重叠
+right ：布尔值，默认为True表示包含最右侧的数值
+	当“ right = True”（默认值）时，则“ bins”=[1、2、3、4]表示       （1,2]，（2,3],（3,4]
+    当bins是一个间隔索引时，该参数被忽略
+
+```
+
+# pd.get_dummies()
+
+是利用pandas实现one hot encode的方式
+
+```python
+df = pd.DataFrame([
+            ['green' , 'A'],
+            ['red'   , 'B'],
+            ['blue'  , 'A']])
+print(df)
+"""
+       0  1
+0  green  A
+1    red  B
+2   blue  A
+"""
+df.columns = ['color',  'class']
+df=pd.get_dummies(df,columns=["color"])
+指定的列变one-hot
+print(df)
+"""
+  class  color_blue  color_green  color_red
+0     A           0            1          0
+1     B           0            0          1
+2     A           1            0          0
+"""
+```
+
+# DataFrame.columns.values.tolist()
+
+也就是把数据的列名变成依次装进列表
+
+```python
+df = pd.DataFrame([
+            ['green' , 'A'],
+            ['red'   , 'B'],
+            ['blue'  , 'A']])
+df.columns = ['color',  'class']
+print(df)
+de = pd.DataFrame([
+            ['blue' , 'A'],
+            ['brown'   , 'B']])
+de.columns = ['kl',  'sb']
+
+a = df.columns.values.tolist()
+print(a)
+# ['color', 'class']
+b = de.columns.values.tolist()
+print(b)
+#['kl', 'sb']
+c = a+b
+print(c)
+#['color', 'class', 'kl', 'sb']
+
+```
+
+# DataFrame.merge
+
+```python
+def merge(
+    self,
+    right,
+    how="inner",
+    on=None,
+    left_on=None,
+    right_on=None,
+    left_index=False,
+    right_index=False,
+    sort=False,
+    suffixes=("_x", "_y"),
+    copy=True,
+    indicator=False,
+    validate=None,
+) 
+on：可以指定以哪个列名进行拼接
+merge是按照两个dataframe共有的column进行连接，两个dataframe必须具有同名的column
+
+
+data1= pd.DataFrame({'id':[12,13,14,15,16],'age':[45,56,78,45,96]})
+print(data1)
+   id  age
+0  12   45
+1  13   56
+2  14   78
+3  15   45
+4  16   96
+data2= pd.DataFrame({'id':[12,13,14,15,16],'score':[100,60,99,56,70]})
+   id  score
+0  12    100
+1  13     60
+2  14     99
+3  15     56
+4  16     70
+data1 = data1.merge(data2,on=['id'],how='left')
+print(data1)
+   id  age  score
+0  12   45    100
+1  13   56     60
+2  14   78     99
+3  15   45     56
+4  16   96     70
+重点说一下“how”这个参数，类似于左，右连接的意思
+how='left'就是依照左边的数据，如果右边的数据缺失就会自动用nan补齐
+   id  age    左
+0  12   45
+1  13   56
+2  14   78
+3  15   45
+4  16   96
+   id  score  右
+0  10    100
+1  13     60
+2  14     99
+3  15     56
+   id  age  score  组合
+0  12   45    NaN
+1  13   56   60.0
+2  14   78   99.0
+3  15   45   56.0
+4  16   96    NaN
+```
+
