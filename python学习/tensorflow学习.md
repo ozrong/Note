@@ -1205,3 +1205,43 @@ limit=sqrt(6 / (fan_in + fan_out))
 stddev = sqrt(2 / (fan_in + fan_out))
 
 其中的fan_in和fan_out分别表示输入单元的结点数和输出单元的结点数。
+
+# tensorflow显存和利用率问题
+
+==首先TensorFlow会默认直接占满我们模型部署的GPU的存储资源，只允许一个小内存的程序也会占用所有GPU资源==
+
+
+
+**float64格式会降低GPU的计算**
+
+## **两种限定GPU占用量的方法**
+
+**方法一**、设置定量的GPU显存使用量:
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.4 # 占用GPU40%的显存
+session = tf.Session(config=config)
+
+**方法二**、设置最小的GPU显存使用量，动态申请显存:（建议）
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
+
+# 指定显卡
+
+**在终端执行程序时指定GPU** 
+
+CUDA_VISIBLE_DEVICES=1  python your_file.py
+
+可用的形式如下：
+
+CUDA_VISIBLE_DEVICES=1      Only device 1 will be seen
+CUDA_VISIBLE_DEVICES=0,1     Devices 0 and 1 will be visible
+CUDA_VISIBLE_DEVICES="0,1"    Same as above, quotation marks are optional
+CUDA_VISIBLE_DEVICES=0,2,3    Devices 0, 2, 3 will be visible; device 1 is masked
+
+CUDA_VISIBLE_DEVICES=""     No GPU will be visible
+
+**在Python代码中指定GPU**
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
