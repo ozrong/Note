@@ -126,3 +126,34 @@ Eg:::
     }
 ```
 
+# [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
+
+```java
+class Solution {
+    public int[][] allCellsDistOrder(int R, int C, int r0, int c0) {
+    int[][] re = new int[R*C][]; //定义一个可以容纳所有的坐标的二维数组
+        
+        //装下所有的数组
+                for (int r = 0; r <R ; r++) {
+            for (int c = 0; c <C ; c++) {
+                re[r*C+c] = new int[]{r,c};
+            }
+                }
+        //使用Arrays直接操作二维数组，使用Comparator指定的规则排序
+        Arrays.sort(re, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return ((Math.abs(o1[0]-r0) + Math.abs(o1[1]-c0))-(Math.abs(o2[0]-r0) + Math.abs(o2[1]-c0)));
+            }
+        });
+                return re;
+
+    }
+}
+这种方法的复杂度有点高
+    
+    
+  方法二：使用桶排序
+```
+
+## 桶排序
