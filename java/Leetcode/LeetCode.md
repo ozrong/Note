@@ -1,3 +1,328 @@
+  # 14.1 环形链表
+
+```java
+//方法一
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        Set<ListNode> set = new HashSet<>();//利用set不可以存储相同的值的特性来遍历这个链表
+        while(head!= null){
+            if(!set.add(head)){
+                return true;
+            }
+            head = head.next;
+            }
+            
+        }
+    }
+}
+//方式二：快慢指针
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        /*
+        使用while的时候，初始化slow和fast的时候 slow要在fast前面
+        使用do-while就可以在同一起点
+        
+        
+        就想操场跑圈一样，快指针必然会追上慢指针（两者重逢）
+        */
+        while (slow != fast){
+            if(fast==null||fast.next !=null){
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;   
+    }
+}
+```
+
+#  1002. 查找常用字符
+
+```java
+方法一
+class Solution {
+    public List<String> commonChars(String[] A) {
+        int[] minlist = new int[26];
+        Arrays.fill(minlist,Integer.MAX_VALUE);
+        for (String word:A){
+            int[] list1 = new int[26];
+            int length = word.length();
+            for (int i = 0; i <length ; i++) {//统计在字符串中字符出现的次数
+                char ch = word.charAt(i);
+                ++list1[ch-'a'];//表示第几个字母的那个为位置加一
+                // list1[ch-'a'] = list1[ch-'a']+1
+            }
+            for (int i = 0; i <26 ; i++) {
+                minlist[i] = Math.min(minlist[i],list1[i]);
+            }
+        }
+        List<String> ans = new ArrayList<>();
+        for (int i = 0; i <26 ; i++) {
+            for (int j = 0; j <minlist[i] ; j++) {
+                ans.add(String.valueOf((char)(i+'a')));
+                //这是因为出现了几次这个字符就要显示几次，所以是两次循环                
+            }
+        }
+        return ans;
+    }
+}
+方法二
+    //思想的差不多，没理解到
+    class Solution {
+    public List<String> commonChars(String[] A) {
+        //先得到第一个字符串里面每个字符的情况
+        int[] charCount = new int[26];
+        for(int i = 0; i < A[0].length(); i++){
+            charCount[A[0].charAt(i) - 'a']++;
+        }
+        //从第1个开始逐个进行比较
+        for(int i = 1; i < A.length; i++){
+            int[] curCount = new int[26];
+            
+            //遍历第i个字符串
+            for(int j = 0; j < A[i].length(); j++){
+                curCount[A[i].charAt(j) - 'a']++;
+            }
+
+            //将此时关于第i个字符串的情况与charCount对比，取小的即可
+            for(int k = 0; k < 26; k++){
+                charCount[k] = Math.min(charCount[k], curCount[k]);
+            }
+        }
+
+        //此时的charCount即为所有的字符串出现的共有的最小元素的个数
+        List<String> result = new ArrayList<>();
+        for(int i = 0; i < 26; i++){
+            while(charCount[i] != 0){
+                result.add(String.valueOf((char)(i + 'a')));
+                charCount[i]--;
+            }
+        }
+
+        return result;
+    }
+}
+
+```
+
+# [116. 填充每个节点的下一个右侧节点指针](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node/)
+
+```java
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public Node left;
+    public Node right;
+    public Node next;
+
+    public Node() {}
+    
+    public Node(int _val) {
+        val = _val;
+    }
+
+    public Node(int _val, Node _left, Node _right, Node _next) {
+        val = _val;
+        left = _left;
+        right = _right;
+        next = _next;
+    }
+};
+*/
+
+class Solution {
+    public Node connect(Node root) {
+        if (root == null) {
+            return root;
+        }
+   
+        // 初始化队列同时将第一层节点加入队列中，即根节点
+        Queue<Node> queue = new LinkedList<Node>(); 
+        queue.add(root);
+        
+        // 外层的 while 循环迭代的是层数
+        while (!queue.isEmpty()) {
+            
+            // 记录当前队列大小
+            int size = queue.size();
+            
+            // 遍历这一层的所有节点
+            for (int i = 0; i < size; i++) {
+                
+                // 从队首取出元素
+                Node node = queue.poll();
+                
+                // 连接
+                if (i < size - 1) {
+                    node.next = queue.peek();
+                }
+                
+                // 拓展下一层节点
+                if (node.left != null) {
+                    queue.add(node.left);
+                }
+                if (node.right != null) {
+                    queue.add(node.right);
+                }
+            }
+        }
+        
+        // 返回根节点
+        return root;
+    }
+}
+
+```
+
+# [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
+
+自己的错误代码：
+
+```java
+class Solution {
+    public void reorderList(ListNode head) {
+        ListNode begin = head;
+        while (head !=null && head.next!=null){
+            ListNode first = head;
+            head = head.next;
+            ListNode temp = head;
+            while (true){
+                if(temp!=null && temp.next!=null && temp.next.next==null){
+                    break;
+                }else{
+                    temp = temp.next;
+                }
+            }
+            ListNode end = temp.next;
+            temp.next=null;
+
+            first.next = end;
+            end.next = head;
+        }
+        head = begin; 
+        return head;
+    }
+}
+绝对可行，下次再调
+```
+
+思路：    
+    1.快慢指针找到中点 2.拆成两个链表 3.遍历两个链表，后面的塞到前面的“缝隙里”
+    
+
+方法一：
+
+因为链表不支持下标访问，所以我们无法随机访问链表中任意位置的元素。
+
+因此比较容易想到的一个方法是，我们利用线性表存储该链表，然后利用线性表可以下标访问的特点，直接按顺序访问指定元素，重建该链表即可。
+
+```java
+class Solution {
+    public void reorderList(ListNode head) {
+        if (head == null) {
+            return;
+        }
+        List<ListNode> list = new ArrayList<ListNode>();
+        ListNode node = head;
+        while (node != null) {
+            list.add(node);
+            node = node.next;
+        }
+        int i = 0, j = list.size() - 1;
+        while (i < j) {
+            list.get(i).next = list.get(j);
+            i++;
+            if (i == j) {
+                break;
+            }
+            list.get(j).next = list.get(i);
+            j--;
+        }
+        list.get(i).next = null;
+    }
+}
+这个方法最简单
+```
+
+方法二：
+
+方法二：寻找链表中点 + 链表逆序 + 合并链表
+注意到目标链表即为将原链表的左半端和反转后的右半端合并后的结果。
+
+这样我们的任务即可划分为三步：
+
++ 找到原链表的中点（参考[876. 链表的中间结点](https://leetcode-cn.com/problems/middle-of-the-linked-list/)）。
+
+我们可以使用快慢指针来 O(N)O(N) 地找到链表的中间节点。
+
++ 将原链表的右半端反转（参考[206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)）。
+
+我们可以使用迭代法实现链表的反转。
+
++ 将原链表的两端合并。
+
+因为两链表长度相差不超过 1，因此直接合并即可。
+
+```java
+class Solution {
+    public void reorderList(ListNode head) {
+        if (head == null) {
+            return;
+        }
+        ListNode mid = middleNode(head);
+        ListNode l1 = head;
+        ListNode l2 = mid.next;
+        mid.next = null;
+        l2 = reverseList(l2);
+        mergeList(l1, l2);
+    }
+
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode nextTemp = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextTemp;
+        }
+        return prev;
+    }
+
+    public void mergeList(ListNode l1, ListNode l2) {
+        ListNode l1_tmp;
+        ListNode l2_tmp;
+        while (l1 != null && l2 != null) {
+            l1_tmp = l1.next;
+            l2_tmp = l2.next;
+
+            l1.next = l2;
+            l1 = l1_tmp;
+
+            l2.next = l1;
+            l2 = l2_tmp;
+        }
+    }
+}
+```
+
 # 406[根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
 
 假设有打乱顺序的一群人站成一个队列。 每个人由一个整数对(h, k)表示，其中h是这个人的身高，k是排在这个人前面且身高大于或等于h的人数。 编写一个算法来重建这个队列。
@@ -315,7 +640,7 @@ public int canCompleteCircuit(int[] gas, int[] cost) {
 
 把自己搞蒙了，%是取模运算（取余）不是取小数
 
-## [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+# [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
 
 最简单的方法就是像冒泡排序一样把0向后面丢就可以了
 
