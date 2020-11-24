@@ -831,3 +831,44 @@ class Solution {
 
 ## lambda
 
+# [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)（太难了）
+
+绝对可以用递归
+
+```java
+果然
+    class Solution {
+    public int countNodes(TreeNode root) {
+    	if(root == null) {
+    		return 0;
+    	}
+    	int left = countNodes(root.left);
+    	int right = countNodes(root.right);
+    	
+    	return left+right+1;
+    	
+    }
+}    
+```
+
+
+
+## 树的知识
+
+### 完全二叉树
+
+当 $0<=i<=h$时，第$ i$层包含$2^i$个节点，最底层包含的节点数最少为 1，最多为$2^h$
+
+当最底层包含 1个节点时，完全二叉树的节点个数是
+$$
+\sum_{i=0}^{h-1} 2^{i}+1=2^{h}
+$$
+当最底层包含$2^h$个节点时，完全二叉树的节点个数是
+$$
+\sum_{i=0}^{h} 2^{i}=2^{h+1}-1
+$$
+因此对于最大层数为 hhh 的完全二叉树，节点个数一定在$\left[2^{h}, 2^{h+1}-1\right]$ 的范围内，可以在该范围内通过二分查找的方式得到完全二叉树的节点个数
+
+## 二分查找
+
+## 位运算
