@@ -1,4 +1,128 @@
-  # 14.1 环形链表
+# Java 8 中的 Streams API
+
+## **为什么需要 Stream**
+
+Stream 作为 Java 8 的一大亮点，它与 java.io 包里的 InputStream 和 OutputStream 是完全不同的概念。它也不同于 StAX 对 XML 解析的 Stream，也不是 Amazon Kinesis 对大数据实时处理的 Stream。Java 8 中的 Stream 是对集合（Collection）对象功能的增强，它专注于对集合对象进行各种非常便利、高效的聚合操作（aggregate operation），或者大批量数据操作 (bulk data operation)。Stream API 借助于同样新出现的 Lambda 表达式，极大的提高编程效率和程序可读性。同时它提供串行和并行两种模式进行汇聚操作，并发模式能够充分利用多核处理器的优势，使用 fork/join 并行方式来拆分任务和加速处理过程。通常编写并行代码很难而且容易出错, 但使用 Stream API 无需编写一行多线程的代码，就可以很方便地写出高性能的并发程序。所以说，Java 8 中首次出现的 java.util.stream 是一个函数式语言+多核时代综合影响的产物。
+
+## 什么是流
+
+Stream 不是集合元素，它不是数据结构并不保存数据，它是有关算法和计算的，它更像一个高级版本的 Iterator。原始版本的 Iterator，用户只能显式地一个一个遍历元素并对其执行某些操作；高级版本的 Stream，用户只要给出需要对其包含的元素执行什么操作，比如 “过滤掉长度大于 10 的字符串”、“获取每个字符串的首字母”等，Stream 会隐式地在内部进行遍历，做出相应的数据转换。
+
+而和迭代器又不同的是，Stream 可以并行化操作，迭代器只能命令式地、串行化操作。顾名思义，当使用串行方式去遍历时，每个 item 读完后再读下一个 item。而使用并行去遍历时，数据会被分成多个段，其中每一个都在不同的线程中处理，然后将结果一起输出。Stream 的并行操作依赖于 Java7 中引入的 Fork/Join 框架（JSR166y）来拆分任务和加速处理过程。Java 的并行 API 演变历程基本如下：
+
++ 1.0-1.4 中的 java.lang.Thread
+
++ 5.0 中的 java.util.concurrent
+
++ 6.0 中的 Phasers 等
+
++ 7.0 中的 Fork/Join 框架
+
++ 8.0 中的 Lambda
+
+Stream 的另外一大特点是，数据源本身可以是无限的
+
+### 流的构成
+
+当我们使用一个流的时候，通常包括**三个基本步骤：**
+
+获取一个数据源（source）→ 数据转换→执行操作获取想要的结果，每次转换原有 Stream 对象不改变，返回一个新的 Stream 对象（可以有多次转换），这就允许对其操作可以像链条一样排列，
+
+## 生成 Stream
+
+有多种方式生成 Stream Source：
+
+- 从 Collection 和数组
+
+  - Collection.stream()
+
+  - Collection.parallelStream()
+  - Arrays.stream(T array) or Stream.of()
+
+- 其他（学到了在补充）
+
+  
+
+# Arrays
+
+## Arrays.asList与Arrays.stream
+
+Arrays.asList 将数组转化为list
+
+```java
+List list = Arrays.asList("a","ab","abc");
+list.clear(); //报错
+list.remove("a");//报错
+list.add("g");//报错
+
+这是因为使用这种方式初始化的List是不能改变的
+```
+
+Arrays.stream将数组转换成流
+
+## Arrays.sort
+
+Arrays.sort(int[] a)      这种形式是对一个数组的所有元素进行排序, 从小到大的顺序
+
+Arrays类的sort()方法是对一个数组进行排序的方法，sort()方法的参数是一个对象数组，也就是要排序的那个数组，**但是有些特别的是，这个对象数组中存储的对象的类必须实现了Comparable接口**
+
+# java链表
+
+```java
+链表结构;
+class NodeList{
+    int val;
+    NodeList next;
+    NodeList (int val){
+        this.val = val;
+    }
+}
+以上就是一个链表类;
+
+NodeList head = new NodeList(23);
+NodeList frist = new NodeList(25);
+
+head.next = frist; //这就连接起来了
+
+```
+
+
+
+# 字符串
+
+## 1. charAt
+
+```
+public char charAt(int index)  返回指定位置的字符
+```
+
+## 2. StringBuffer
+
+StringBuffer ret = new StringBuffer();
+
+可以向python中列表一样添加字符
+
+```java
+StringBuffer ret = new StringBuffer();
+ret.append("ssss");
+ret.append('h');
+ret.append(2);
+StringBuffer kk = new StringBuffer("hahahahhahaha");
+ret.append(kk);
+System.out.println(ret.toString());
+
+"""
+    append() 可以添加很多东西，如下面的图 所有的应该都会转化为字符
+"""
+```
+
+
+
+![image-20201125203905318](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201125203905318.png)
+
+# 简单--------
+
+  ## [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
 
 ```java
 //方法一
@@ -42,29 +166,7 @@ public class Solution {
 }
 ```
 
-## java链表
-
-```java
-链表结构;
-class NodeList{
-    int val;
-    NodeList next;
-    NodeList (int val){
-        this.val = val;
-    }
-}
-以上就是一个链表类;
-
-NodeList head = new NodeList(23);
-NodeList frist = new NodeList(25);
-
-head.next = frist; //这就连接起来了
-
-```
-
-
-
-#  1002. 查找常用字符
+##  1002. 查找常用字符
 
 ```java
 方法一
@@ -133,7 +235,216 @@ class Solution {
 
 ```
 
-# [116. 填充每个节点的下一个右侧节点指针](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node/)
+# [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
+
+我自己的想法是把距离当作Key,对应的单元格当成value.显然这样是不行的，因为hashmap的key是不可以重复的
+
+基于哈希表的实现的`Map`接口。 此实现提供了所有可选的Map操作
+
+```java
+public int size();返回此地图中键值映射的数量;
+public boolean isEmpty()如果此地图不包含键值映射，则返回 true;
+public V get(Object key)返回到指定键所映射的值，或null如果此映射包含该键的映射;
+public V put(K key,V value)将指定的值与此映射中的指定键相关联。 如果地图先前包含了该键的映射，则替换旧值;
+public boolean containsKey(Object key)如果此映射包含指定键的映射，则返回 true ;
+public void putAll(Map<? extends K,? extends V> m)将指定地图的所有映射复制到此地图。 这些映射将替换此映射对当前在指定映射中的任何键的任何映射。;
+public V remove(Object key)从该地图中删除指定键的映射（如果存在）;
+public void clear()从这张地图中删除所有的映射。 此呼叫返回后，地图将为空;
+
+public Set<K> keySet()返回此地图中包含的键的Set视图。 该集合由地图支持，因此对地图的更改将反映在集合中，反之亦然。 如果在集合中的迭代正在进行中修改映射（除了通过迭代器自己的remove操作），迭代的结果是未定义的。 该组支持元件移除，即从映射中相应的映射，经由Iterator.remove，Set.remove，removeAll，retainAll和clear操作。 它不支持add或addAll操作;
+
+public Collection<V> values()返回此地图中包含的值的Collection视图。 集合由地图支持，因此对地图的更改将反映在集合中，反之亦然。 如果在集合中的迭代正在进行中修改映射（除了通过迭代器自己的remove操作），迭代的结果是未定义的。 该collection支持元素移除，即从映射中相应的映射，经由Iterator.remove，Collection.remove，removeAll，retainAll和clear操作。 它不支持add或addAll操作;
+
+
+```
+
+
+
+```java
+    
+
+
+class Solution {
+    public int[][] allCellsDistOrder(int R, int C, int r0, int c0) {
+    int[][] re = new int[R*C][]; //定义一个可以容纳所有的坐标的二维数组
+        
+        //装下所有的数组
+                for (int r = 0; r <R ; r++) {
+            for (int c = 0; c <C ; c++) {
+                re[r*C+c] = new int[]{r,c};
+            }
+                }
+        //使用Arrays直接操作二维数组，使用Comparator指定的规则排序
+        Arrays.sort(re, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return ((Math.abs(o1[0]-r0) + Math.abs(o1[1]-c0))-(Math.abs(o2[0]-r0) + Math.abs(o2[1]-c0)));
+            }
+        });
+                return re;
+
+    }
+}
+这种方法的复杂度有点高
+    
+    
+  方法二：使用桶排序
+```
+
+### hashmap
+
+### 桶排序
+
+## [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+
+最简单的方法就是像冒泡排序一样把0向后面丢就可以了
+
+```java
+//给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。 
+//
+// 示例: 
+//
+// 输入: [0,1,0,3,12]
+//输出: [1,3,12,0,0] 
+//
+// 说明: 
+//
+// 
+// 必须在原数组上操作，不能拷贝额外的数组。 
+// 尽量减少操作次数。 
+// 
+// Related Topics 数组 双指针
+
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public void moveZeroes(int[] nums) {
+        for (int i = 0; i <nums.length ; i++) {
+            for (int j = i+1; j <nums.length ; j++) {
+                if (nums[i] == 0) {
+                    nums[i] = nums[j];
+                    nums[j]=0;
+                }
+
+
+            }
+
+        }
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+```
+
+## [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/)
+
+## [1370. 上升下降字符串](https://leetcode-cn.com/problems/increasing-decreasing-string/)
+
+```java
+//给你一个字符串 s ，请你根据下面的算法重新构造字符串： 
+//
+// 
+// 从 s 中选出 最小 的字符，将它 接在 结果字符串的后面。 
+// 从 s 剩余字符中选出 最小 的字符，且该字符比上一个添加的字符大，将它 接在 结果字符串后面。 
+// 重复步骤 2 ，直到你没法从 s 中选择字符。 
+// 从 s 中选出 最大 的字符，将它 接在 结果字符串的后面。 
+// 从 s 剩余字符中选出 最大 的字符，且该字符比上一个添加的字符小，将它 接在 结果字符串后面。 
+// 重复步骤 5 ，直到你没法从 s 中选择字符。 
+// 重复步骤 1 到 6 ，直到 s 中所有字符都已经被选过。 
+// 
+//
+// 在任何一步中，如果最小或者最大字符不止一个 ，你可以选择其中任意一个，并将其添加到结果字符串。 
+//
+// 请你返回将 s 中字符重新排序后的 结果字符串 。 
+//
+// 
+//
+// 示例 1： 
+//
+// 输入：s = "aaaabbbbcccc"
+//输出："abccbaabccba"
+//解释：第一轮的步骤 1，2，3 后，结果字符串为 result = "abc"
+//第一轮的步骤 4，5，6 后，结果字符串为 result = "abccba"
+//第一轮结束，现在 s = "aabbcc" ，我们再次回到步骤 1
+//第二轮的步骤 1，2，3 后，结果字符串为 result = "abccbaabc"
+//第二轮的步骤 4，5，6 后，结果字符串为 result = "abccbaabccba"
+// 
+//
+// 示例 2： 
+//
+// 输入：s = "rat"
+//输出："art"
+//解释：单词 "rat" 在上述算法重排序以后变成 "art"
+// 
+//
+// 示例 3： 
+//
+// 输入：s = "leetcode"
+//输出："cdelotee"
+// 
+//
+// 示例 4： 
+//
+// 输入：s = "ggggggg"
+//输出："ggggggg"
+// 
+//
+// 示例 5： 
+//
+// 输入：s = "spo"
+//输出："ops"
+// 
+//
+// 
+//
+// 提示： 
+//
+// 
+// 1 <= s.length <= 500 
+// s 只包含小写英文字母。 
+// 
+// Related Topics 排序 字符串
+
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public String sortString(String s) {
+        int[] number = new int[26];
+        for (int i = 0; i <s.length() ; i++) {
+            number[s.charAt(i)-'a']++;
+        }
+        StringBuffer ret = new StringBuffer();
+        while(ret.length() < s.length()){
+            for (int i = 0; i <26 ; i++) {
+                if(number[i] > 0){
+                ret.append((char)(i+'a'));
+                number[i]--;
+            }
+              }
+            for (int i = 25; i >=0 ; i--) {
+                if(number[i] >0){
+                    ret.append((char)(i+'a'));
+                    number[i]--;
+                }
+            }
+        }
+        return ret.toString();
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+```
+
+
+
+# 中等--------
+
+## [116. 填充每个节点的下一个右侧节点指针](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node/)
 
 ```java
 /*
@@ -203,7 +514,7 @@ class Solution {
 
 ```
 
-# [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
+## [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
 
 自己的错误代码：
 
@@ -345,7 +656,7 @@ class Solution {
 }
 ```
 
-# 406[根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
+## [406. 根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
 
 假设有打乱顺序的一群人站成一个队列。 每个人由一个整数对(h, k)表示，其中h是这个人的身高，k是排在这个人前面且身高大于或等于h的人数。 编写一个算法来重建这个队列。
 
@@ -398,7 +709,7 @@ class Solution {
 
 
 
-## 比较器（Comparator）
+### 比较器（Comparator）
 
 对数组或者List列表，或者Map(非hash)等排序是我们经常使用的一种处理数据的手段
 
@@ -473,68 +784,7 @@ Eg:::
     }
 ```
 
-# [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
-
-## hashmap
-
-我自己的想法是把距离当作Key,对应的单元格当成value.显然这样是不行的，因为hashmap的key是不可以重复的
-
-基于哈希表的实现的`Map`接口。 此实现提供了所有可选的Map操作
-
-```java
-public int size();返回此地图中键值映射的数量;
-public boolean isEmpty()如果此地图不包含键值映射，则返回 true;
-public V get(Object key)返回到指定键所映射的值，或null如果此映射包含该键的映射;
-public V put(K key,V value)将指定的值与此映射中的指定键相关联。 如果地图先前包含了该键的映射，则替换旧值;
-public boolean containsKey(Object key)如果此映射包含指定键的映射，则返回 true ;
-public void putAll(Map<? extends K,? extends V> m)将指定地图的所有映射复制到此地图。 这些映射将替换此映射对当前在指定映射中的任何键的任何映射。;
-public V remove(Object key)从该地图中删除指定键的映射（如果存在）;
-public void clear()从这张地图中删除所有的映射。 此呼叫返回后，地图将为空;
-
-public Set<K> keySet()返回此地图中包含的键的Set视图。 该集合由地图支持，因此对地图的更改将反映在集合中，反之亦然。 如果在集合中的迭代正在进行中修改映射（除了通过迭代器自己的remove操作），迭代的结果是未定义的。 该组支持元件移除，即从映射中相应的映射，经由Iterator.remove，Set.remove，removeAll，retainAll和clear操作。 它不支持add或addAll操作;
-
-public Collection<V> values()返回此地图中包含的值的Collection视图。 集合由地图支持，因此对地图的更改将反映在集合中，反之亦然。 如果在集合中的迭代正在进行中修改映射（除了通过迭代器自己的remove操作），迭代的结果是未定义的。 该collection支持元素移除，即从映射中相应的映射，经由Iterator.remove，Collection.remove，removeAll，retainAll和clear操作。 它不支持add或addAll操作;
-
-
-```
-
-
-
-```java
-
-    
-
-
-class Solution {
-    public int[][] allCellsDistOrder(int R, int C, int r0, int c0) {
-    int[][] re = new int[R*C][]; //定义一个可以容纳所有的坐标的二维数组
-        
-        //装下所有的数组
-                for (int r = 0; r <R ; r++) {
-            for (int c = 0; c <C ; c++) {
-                re[r*C+c] = new int[]{r,c};
-            }
-                }
-        //使用Arrays直接操作二维数组，使用Comparator指定的规则排序
-        Arrays.sort(re, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                return ((Math.abs(o1[0]-r0) + Math.abs(o1[1]-c0))-(Math.abs(o2[0]-r0) + Math.abs(o2[1]-c0)));
-            }
-        });
-                return re;
-
-    }
-}
-这种方法的复杂度有点高
-    
-    
-  方法二：使用桶排序
-```
-
-## 桶排序
-
-# [134. 加油站](https://leetcode-cn.com/problems/gas-station/)
+## [134. 加油站](https://leetcode-cn.com/problems/gas-station/)
 
 ```java
 //在一条环路上有 N 个加油站，其中第 i 个加油站有汽油 gas[i] 升。 
@@ -658,54 +908,11 @@ public int canCompleteCircuit(int[] gas, int[] cost) {
 }
 ```
 
-## %运算符
+### %运算符
 
 把自己搞蒙了，%是取模运算（取余）不是取小数
 
-# [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
-
-最简单的方法就是像冒泡排序一样把0向后面丢就可以了
-
-```java
-//给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。 
-//
-// 示例: 
-//
-// 输入: [0,1,0,3,12]
-//输出: [1,3,12,0,0] 
-//
-// 说明: 
-//
-// 
-// 必须在原数组上操作，不能拷贝额外的数组。 
-// 尽量减少操作次数。 
-// 
-// Related Topics 数组 双指针
-
-
-//leetcode submit region begin(Prohibit modification and deletion)
-class Solution {
-    public void moveZeroes(int[] nums) {
-        for (int i = 0; i <nums.length ; i++) {
-            for (int j = i+1; j <nums.length ; j++) {
-                if (nums[i] == 0) {
-                    nums[i] = nums[j];
-                    nums[j]=0;
-                }
-
-
-            }
-
-        }
-    }
-}
-//leetcode submit region end(Prohibit modification and deletion)
-
-```
-
-# [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/)
-
-# [452. 用最少数量的箭引爆气球](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/)
+## [452. 用最少数量的箭引爆气球](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/)
 
 ```java
 //在二维空间中有许多球形的气球。对于每个气球，提供的输入是水平方向上，气球直径的开始和结束坐标。由于它是水平的，所以纵坐标并不重要，因此只要知道开始和结束的横
@@ -851,9 +1058,9 @@ class Solution {
 
 ```
 
-## lambda
+### lambda
 
-# [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)（太难了）
+## [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)（太难了）
 
 绝对可以用递归
 
@@ -875,7 +1082,7 @@ class Solution {
 
 
 
-## 树的知识
+### 树的知识
 
 ### 完全二叉树
 
@@ -891,110 +1098,137 @@ $$
 $$
 因此对于最大层数为 hhh 的完全二叉树，节点个数一定在$\left[2^{h}, 2^{h+1}-1\right]$ 的范围内，可以在该范围内通过二分查找的方式得到完全二叉树的节点个数
 
-## 二分查找
+### 二分查找
 
-## 位运算
+### 位运算
 
-# [1370. 上升下降字符串](https://leetcode-cn.com/problems/increasing-decreasing-string/)
+# 困难--------
+
+## [164. 最大间距](https://leetcode-cn.com/problems/maximum-gap/)（没做）
 
 ```java
-//给你一个字符串 s ，请你根据下面的算法重新构造字符串： 
+//给定一个无序的数组，找出数组在排序之后，相邻元素之间最大的差值。 
+//
+// 如果数组元素个数小于 2，则返回 0。 
+//
+// 示例 1: 
+//
+// 输入: [3,6,9,1]
+//输出: 3
+//解释: 排序后的数组是 [1,3,6,9], 其中相邻元素 (3,6) 和 (6,9) 之间都存在最大差值 3。 
+//
+// 示例 2: 
+//
+// 输入: [10]
+//输出: 0
+//解释: 数组元素个数小于 2，因此返回 0。 
+//
+// 说明: 
 //
 // 
-// 从 s 中选出 最小 的字符，将它 接在 结果字符串的后面。 
-// 从 s 剩余字符中选出 最小 的字符，且该字符比上一个添加的字符大，将它 接在 结果字符串后面。 
-// 重复步骤 2 ，直到你没法从 s 中选择字符。 
-// 从 s 中选出 最大 的字符，将它 接在 结果字符串的后面。 
-// 从 s 剩余字符中选出 最大 的字符，且该字符比上一个添加的字符小，将它 接在 结果字符串后面。 
-// 重复步骤 5 ，直到你没法从 s 中选择字符。 
-// 重复步骤 1 到 6 ，直到 s 中所有字符都已经被选过。 
+// 你可以假设数组中所有元素都是非负整数，且数值在 32 位有符号整数范围内。 
+// 请尝试在线性时间复杂度和空间复杂度的条件下解决此问题。 
 // 
-//
-// 在任何一步中，如果最小或者最大字符不止一个 ，你可以选择其中任意一个，并将其添加到结果字符串。 
-//
-// 请你返回将 s 中字符重新排序后的 结果字符串 。 
-//
-// 
-//
-// 示例 1： 
-//
-// 输入：s = "aaaabbbbcccc"
-//输出："abccbaabccba"
-//解释：第一轮的步骤 1，2，3 后，结果字符串为 result = "abc"
-//第一轮的步骤 4，5，6 后，结果字符串为 result = "abccba"
-//第一轮结束，现在 s = "aabbcc" ，我们再次回到步骤 1
-//第二轮的步骤 1，2，3 后，结果字符串为 result = "abccbaabc"
-//第二轮的步骤 4，5，6 后，结果字符串为 result = "abccbaabccba"
-// 
-//
-// 示例 2： 
-//
-// 输入：s = "rat"
-//输出："art"
-//解释：单词 "rat" 在上述算法重排序以后变成 "art"
-// 
-//
-// 示例 3： 
-//
-// 输入：s = "leetcode"
-//输出："cdelotee"
-// 
-//
-// 示例 4： 
-//
-// 输入：s = "ggggggg"
-//输出："ggggggg"
-// 
-//
-// 示例 5： 
-//
-// 输入：s = "spo"
-//输出："ops"
-// 
-//
-// 
-//
-// 提示： 
-//
-// 
-// 1 <= s.length <= 500 
-// s 只包含小写英文字母。 
-// 
-// Related Topics 排序 字符串
+// Related Topics 排序
 
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
 //leetcode submit region begin(Prohibit modification and deletion)
-class Solution {
-    public String sortString(String s) {
-        int[] number = new int[26];
-        for (int i = 0; i <s.length() ; i++) {
-            number[s.charAt(i)-'a']++;
+public int maximumGap(int[] nums) {  //没通过
+        int len = nums.length, max = Integer.MIN_VALUE;
+        if(len < 2)return 0;
+        Arrays.sort(nums);
+        for(int i = 1; i < nums.length; i++){
+        int t = nums[i]-nums[i-1];
+        max = Math.max(max,t);
         }
-        StringBuffer ret = new StringBuffer();
-        while(ret.length() < s.length()){
-            for (int i = 0; i <26 ; i++) {
-                if(number[i] > 0){
-                ret.append((char)(i+'a'));
-                number[i]--;
-            }
-              }
-            for (int i = 25; i >=0 ; i--) {
-                if(number[i] >0){
-                    ret.append((char)(i+'a'));
-                    number[i]--;
-                }
-            }
+        return max;
         }
-        return ret.toString();
-    }
-}
 //leetcode submit region end(Prohibit modification and deletion)
 
+
+方法2 基数排序
+   class Solution {
+    public int maximumGap(int[] nums) {
+        int n = nums.length;
+        if (n < 2) {
+            return 0;
+        }
+        long exp = 1;
+        int[] buf = new int[n];
+        int maxVal = Arrays.stream(nums).max().getAsInt();
+        // int最大有10位数也就是十亿以上，所以可能会循环10次以上
+        while (maxVal >= exp) {
+            int[] cnt = new int[10];
+            for (int i = 0; i < n; i++) {// 这里是O(n)
+                int digit = (nums[i] / (int) exp) % 10;
+                cnt[digit]++;
+            }
+            for (int i = 1; i < 10; i++) {
+                cnt[i] += cnt[i - 1];
+            }
+            for (int i = n - 1; i >= 0; i--) {// 这里是O(n)
+                int digit = (nums[i] / (int) exp) % 10;
+                buf[cnt[digit] - 1] = nums[i];
+                cnt[digit]--;
+            }
+            System.arraycopy(buf, 0, nums, 0, n);// 这里是O(n)
+            exp *= 10;
+        }
+        /*  上面的循环最多要10*3*O(n) */
+        int ret = 0;
+        for (int i = 1; i < n; i++) {// 这里是O(n)，加上这里，最多要(30+1)O(n)
+            ret = Math.max(ret, nums[i] - nums[i - 1]);
+        }
+        return ret;
+    }
+}
+
+方法3 基于桶的算法
+    class Solution {
+    public int maximumGap(int[] nums) {
+        int n = nums.length;
+        if (n < 2) {
+            return 0;
+        }
+        int minVal = Arrays.stream(nums).min().getAsInt();
+        int maxVal = Arrays.stream(nums).max().getAsInt();
+        int d = Math.max(1, (maxVal - minVal) / (n - 1));
+        int bucketSize = (maxVal - minVal) / d + 1;
+
+        int[][] bucket = new int[bucketSize][2];
+        for (int i = 0; i < bucketSize; ++i) {
+            Arrays.fill(bucket[i], -1); // 存储 (桶内最小值，桶内最大值) 对， (-1, -1) 表示该桶是空的
+        }
+        for (int i = 0; i < n; i++) {
+            int idx = (nums[i] - minVal) / d;
+            if (bucket[idx][0] == -1) {
+                bucket[idx][0] = bucket[idx][1] = nums[i];
+            } else {
+                bucket[idx][0] = Math.min(bucket[idx][0], nums[i]);
+                bucket[idx][1] = Math.max(bucket[idx][1], nums[i]);
+            }
+        }
+
+        int ret = 0;
+        int prev = -1;
+        for (int i = 0; i < bucketSize; i++) {
+            if (bucket[i][0] == -1) {
+                continue;
+            }
+            if (prev != -1) {
+                ret = Math.max(ret, bucket[i][0] - bucket[prev][1]);
+            }
+            prev = i;
+        }
+        return ret;
+    }
+}
+
+    
 ```
 
 
@@ -1003,37 +1237,5 @@ class Solution {
 
 
 
-
-
-# 字符串
-
-## 1. charAt
-
-```
-public char charAt(int index)  返回指定位置的字符
-```
-
-## 2. StringBuffer
-
-StringBuffer ret = new StringBuffer();
-
-可以向python中列表一样添加字符
-
-```java
-StringBuffer ret = new StringBuffer();
-ret.append("ssss");
-ret.append('h');
-ret.append(2);
-StringBuffer kk = new StringBuffer("hahahahhahaha");
-ret.append(kk);
-System.out.println(ret.toString());
-
-"""
-    append() 可以添加很多东西，如下面的图 所有的应该都会转化为字符
-"""
-```
-
-
-
-![image-20201125203905318](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201125203905318.png)
+### 基数排序
 
