@@ -1,3 +1,28 @@
+# ArrayList
+
+**ArrayList只是一个存放对象的容器。所以可以存放重复的数据**
+**像Map中key-value那样的key不能重复，key重复的话原来的key所对应的value就被覆盖了**
+
+
+
+**Question1: 常见的List类有哪些，它们分别有什么区别？**
+
+**答：**常见的有ArrayList，Vector，LinkedList等。ArrayList底层是数组组成，Vector是线程安全的ArrayList类。LinkedList底层是由链表组成。ArrayList与Vector的区别，扩容上面ArrayList是扩容1.5倍，而Vector是扩容两倍。Vector是线程安全的使用synchronized关键字来保证线程安全，但是效率更低。
+
+**Question2: ArrayList是如何增加容量的？**
+
+**答:** 当存入数据到ArrayList中去的时候，都需要检查容量是否够，如果够的话，直接存入即可。如果不够的话，就会启动扩容机制，首先扩容至原容量的1.5倍大小，判断是否足够，如果不够就按照当前的容量扩容。当前的容量需要判断是否小于最大的容量（Integer.MAX_VALUE-8），如果不小于，则扩容至最大的容量，Integer的最大值。
+
+**Question3：ArrayList和LinkedList在实际应用中应该如何选择？**
+
+**答：**ArrayList实现了RandomAccess接口，支持快速随机访问，访问的速度很快，而ArrayList在增加和删除元素的时候，每次增加或者删除一个元素，由于是数组实现的，所有的数据都需要移动n次（就是用System.arrayCopy实现的），这是一种极为消耗资源的操作。但是LinkedList就不同，LinkedList底层是链表实现的，增加和删除元素较快，查找的话比较慢。所以一般在实际应用中，如果涉及到大量的查找的话，使用ArrayList，涉及到大量的增删操作的话，建议使用LinkedList。
+
+ArrayList与LinkedList都允许存储null也允许存储重复元素。不要使用for循环遍历LinkedList，效率很低。
+
+**Question5: Arrays.asList之后获得的集合能够扩容吗？**
+
+**答：**不能扩容，因为这样获取到的一个集合是final的。所以不能够扩容或者修改
+
 # Java 8 中的 Streams API
 
 ## **为什么需要 Stream**
@@ -255,7 +280,6 @@ public Set<K> keySet()返回此地图中包含的键的Set视图。 该集合由
 
 public Collection<V> values()返回此地图中包含的值的Collection视图。 集合由地图支持，因此对地图的更改将反映在集合中，反之亦然。 如果在集合中的迭代正在进行中修改映射（除了通过迭代器自己的remove操作），迭代的结果是未定义的。 该collection支持元素移除，即从映射中相应的映射，经由Iterator.remove，Collection.remove，removeAll，retainAll和clear操作。 它不支持add或addAll操作;
 
-
 ```
 
 
@@ -292,6 +316,44 @@ class Solution {
 ```
 
 ### hashmap
+
+**HashMap的实现原理**
+
+HashMap的主干是一个Entry数组。Entry是HashMap的基本组成单元，每一个Entry包含一个key-value键值对。（其实所谓Map其实就是保存了两个对象之间的映射关系的一种集合
+
+```java
+Entry是HashMap中的一个静态内部类  
+static class Entry<K,V> implements Map.Entry<K,V> {
+        final K key;
+        V value;
+        Entry<K,V> next;//存储指向下一个Entry的引用，单链表结构
+        int hash;//对key的hashcode值进行hash运算后得到的值，存储在Entry，避免重复计算
+
+        /**
+         * Creates new entry.
+         */
+        Entry(int h, K k, V v, Entry<K,V> n) {
+            value = v;
+            next = n;
+            key = k;
+            hash = h;
+        } 
+
+```
+
+### hashset和hashMap
+
+**什么是HashSet**
+
+HashSet实现了Set接口，它不允许集合中有重复的值，当我们提到HashSet时，第一件事情就是在将对象存储在HashSet之前，要先确保对象重写equals()和hashCode()方法，这样才能比较对象的值是否相等，以确保set中没有储存相等的对象。如果我们没有重写这两个方法，将会使用这个方法的默认实现。
+
+public boolean add(Object o)方法用来在Set中添加元素，当元素值重复时则会立即返回false，如果成功添加的话会返回true。
+
+**什么是HashMap**
+
+HashMap实现了Map接口，Map接口对键值对进行映射。Map中不允许重复的键。Map接口有两个基本的实现，HashMap和TreeMap。TreeMap保存了对象的排列次序，而HashMap则不能。HashMap允许键和值为null。HashMap是非synchronized的，但collection框架提供方法能保证HashMap synchronized，这样多个线程同时访问HashMap时，能保证只有一个线程更改Map。
+
+![image-20201127212243646](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201127212243646.png)
 
 ### 桶排序
 
@@ -1101,6 +1163,104 @@ $$
 ### 二分查找
 
 ### 位运算
+
+## [454. 四数相加 II](https://leetcode-cn.com/problems/4sum-ii/)
+
+**方法1 暴力解法**
+
+```java
+//给定四个包含整数的数组列表 A , B , C , D ,计算有多少个元组 (i, j, k, l) ，使得 A[i] + B[j] + C[k] + D[
+//l] = 0。 
+//
+// 为了使问题简单化，所有的 A, B, C, D 具有相同的长度 N，且 0 ≤ N ≤ 500 。所有整数的范围在 -228 到 228 - 1 之间，最
+//终结果不会超过 231 - 1 。 
+//
+// 例如: 
+//
+// 
+//输入:
+//A = [ 1, 2]
+//B = [-2,-1]
+//C = [-1, 2]
+//D = [ 0, 2]
+//
+//输出:
+//2
+//
+//解释:
+//两个元组如下:
+//1. (0, 0, 0, 1) -> A[0] + B[0] + C[0] + D[1] = 1 + (-2) + (-1) + 2 = 0
+//2. (1, 1, 0, 0) -> A[1] + B[1] + C[0] + D[0] = 2 + (-1) + (-1) + 0 = 0
+// 
+// Related Topics 哈希表 二分查找
+
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public int fourSumCount(int[] A, int[] B, int[] C, int[] D) {
+        int len_A =A.length;
+        int len_B =B.length;
+        int len_C =C.length;
+        int len_D =D.length;
+        int ans =0;
+        for (int i = 0; i <len_A ; i++) {
+            for (int j = 0; j <len_B ; j++) {
+                for (int k = 0; k <len_C ; k++) {
+                    for (int l = 0; l <len_D ; l++) {
+                        if (A[i] + B[j] + C[k]+D[l] == 0) {
+                            ans++;
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+超时========================================
+```
+
+**方法一：分组 + 哈希表**
+
+我们可以将四个数组分成两部分，AAA 和 BBB 为一组，CCC 和 DDD 为另外一组。
+
+对于 AAA 和 BBB，我们使用二重循环对它们进行遍历，得到所有 A[i]+B[j]A[i]+B[j]A[i]+B[j] 的值并存入哈希映射中。对于哈希映射中的每个键值对，每个键表示一种 A[i]+B[j]A[i]+B[j]A[i]+B[j]，对应的值为 A[i]+B[j]A[i]+B[j]A[i]+B[j] 出现的次数。
+
+对于 CCC 和 DDD，我们同样使用二重循环对它们进行遍历。当遍历到 C[k]+D[l]C[k]+D[l]C[k]+D[l] 时，如果 −(C[k]+D[l])-(C[k]+D[l])−(C[k]+D[l]) 出现在哈希映射中，那么将 −(C[k]+D[l])-(C[k]+D[l])−(C[k]+D[l]) 对应的值累加进答案中。
+
+最终即可得到满足 A[i]+B[j]+C[k]+D[l]=0A[i]+B[j]+C[k]+D[l]=0A[i]+B[j]+C[k]+D[l]=0 的四元组数目
+
+```java
+class Solution {
+    public int fourSumCount(int[] A, int[] B, int[] C, int[] D) {
+        int len_A =A.length;
+        int len_B =B.length;
+        int len_C =C.length;
+        int len_D =D.length;
+
+        int ans =0;
+        Map<Integer,Integer>  countAB = new HashMap<>();
+
+        for (int i:A) {
+            for (int j :B) {
+                countAB.put(i+j,countAB.getOrDefault(i+j,0)+1);
+                    }
+                }
+        for (int k:C){
+            for(int l:D){
+                int key = -(k+l);
+                if(countAB.containsKey(key)){
+                    ans+=countAB.get(key);
+                }
+            }
+        }
+        return ans;
+    }
+}
+```
+
+
 
 # 困难--------
 
