@@ -260,7 +260,7 @@ class Solution {
 
 ```
 
-# [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
+## [1030. 距离顺序排列矩阵单元格](https://leetcode-cn.com/problems/matrix-cells-in-distance-order/)
 
 我自己的想法是把距离当作Key,对应的单元格当成value.显然这样是不行的，因为hashmap的key是不可以重复的
 
@@ -500,6 +500,356 @@ class Solution {
 }
 //leetcode submit region end(Prohibit modification and deletion)
 
+```
+
+## [976. 三角形的最大周长](https://leetcode-cn.com/problems/largest-perimeter-triangle/)
+
+**暴力解法（就是超时）**
+
+```java
+//给定由一些正数（代表长度）组成的数组 A，返回由其中三个长度组成的、面积不为零的三角形的最大周长。 
+//
+// 如果不能形成任何面积不为零的三角形，返回 0。 
+//
+// 
+//
+// 
+// 
+//
+// 示例 1： 
+//
+// 输入：[2,1,2]
+//输出：5
+// 
+//
+// 示例 2： 
+//
+// 输入：[1,2,1]
+//输出：0
+// 
+//
+// 示例 3： 
+//
+// 输入：[3,2,3,4]
+//输出：10
+// 
+//
+// 示例 4： 
+//
+// 输入：[3,6,2,3]
+//输出：8
+// 
+//
+// 
+//
+// 提示： 
+//
+// 
+// 3 <= A.length <= 10000 
+// 1 <= A[i] <= 10^6 
+// 
+// Related Topics 排序 数学
+
+
+import sun.font.FontRunIterator;
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public int largestPerimeter(int[] A) {
+        int len = A.length;
+        int max = 0;
+        if(len==0)return 0;
+        for (int i = 0; i <len-2 ; i++) {
+            for (int j = i+1; j <len-1 ; j++) {
+                for (int k = j+1; k <len ; k++) {
+                    if(A[i]+A[j] > A[k] && Math.abs(A[i]-A[j])<A[k]){
+                        int temp = A[i]+A[j]+A[k];
+                        if (temp > max) max=temp;
+                    }
+                }
+
+            }
+
+        }
+return max;
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+```
+
+**方法一：贪心 + 排序**
+
+不失一般性，我们假设三角形的边长满足 a≤b≤ca \leq b \leq ca≤b≤c，那么这三条边组成面积不为零的三角形的充分必要条件为 a+b>ca+b>ca+b>c。
+
+基于此，我们可以选择枚举三角形的最长边 ccc，而从贪心的角度考虑，我们一定是选「小于 ccc 的最大的两个数」作为边长 aaa 和 bbb，此时最有可能满足 a+b>ca+b>ca+b>c，使得三条边能够组成一个三角形，且此时的三角形的周长是最大的。
+
+因此，我们先对整个数组排序，倒序枚举第 iii 个数作为最长边，那么我们只要看其前两个数 A[i−2]和 A[i−1]，判断 A[i−2]+A[i−1]A[i-2]是否大于 A[i]即可，如果能组成三角形我们就找到了最大周长的三角形，返回答案 A[i−2]+A[i−1]+A[i] 即可。如果对于任何数作为最长边都不存在面积不为零的三角形，则返回答案 0
+
+```java
+class Solution {
+    public int largestPerimeter(int[] A) {
+        Arrays.sort(A);
+        for (int i = A.length - 1; i >= 2; --i) { //注意  数值的最后一个数是length-1   如果写成length 溢出了  
+                                                 // eg: a=[4,5,6]  length = 3   a[length-1] = a[2] =6 别忘记数据的索引是从0开始的
+            if (A[i - 2] + A[i - 1] > A[i]) {
+                return A[i - 2] + A[i - 1] + A[i];
+            }
+        }
+        return 0;
+    }
+}
+
+
+作者：LeetCode-Solution
+链接：https://leetcode-cn.com/problems/largest-perimeter-triangle/solution/san-jiao-xing-de-zui-da-zhou-chang-by-leetcode-sol/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+
+
+### 7种排序的解法
+
+```JAVA
+//堆排序所用的数据结构
+public class Heap
+    {
+        private List<int> heap;
+        public Heap()
+        {
+            heap = new List<int>();
+        }
+        public void Insert(int node)
+        {
+            heap.Add(node);
+            int i = heap.Count - 1;
+            for (; i >= 0 && heap[Div(i)] < node;i= Div(i))
+            {
+                heap[i] = heap[Div(i)];
+                if (i == 0) break;
+            }
+            heap[i] = node;
+        }
+        public int DeleteMax()
+        {
+            int res=0;
+            if (heap.Count == 1) {
+                res = Pop();
+                return res;
+            }
+            Solution.swap(heap, 0, heap.Count - 1);
+            int temp = heap[0];
+            res = Pop();
+            int child = 1, parent = 0;
+            for (; (child = parent * 2 + 1) < heap.Count; parent = child)
+            {
+                if (child + 1 < heap.Count && heap[child] < heap[child + 1]) child++;
+                if (temp >= heap[child]) break;
+                else
+                {
+                    heap[parent] = heap[child];
+                }
+            }
+            heap[parent] = temp;
+            return res;
+        }
+        public int Pop()
+        {
+            int res = heap[heap.Count - 1];
+            heap.RemoveAt(heap.Count - 1);
+            return res;
+        }
+        //除以一半,为了找到该节点的父节点坐标,因为堆排序中下标0的元素不是哨兵,所以父节点是i的情况,子节点是2i+1和2i+2.
+        public static int Div(int i)
+        {
+            if (i == 0) return i;
+            if ((i & 1) == 1) return i >> 1;
+            return (i - 1) >> 1;
+        }
+    }
+public class Solution {
+    public int LargestPerimeter(int[] A) {
+
+        //int []tempNums=new int[A.Length];
+        //MergeSort(A,tempNums,0,A.Length-1);
+
+        //TongSort(A);
+
+        //MaoPaoSort(A);
+
+        //InsertSort(A);
+
+        //ShellSort(A);
+
+        //HeapSort(A);
+
+        QuickSort(A,0,A.Length-1);
+        for(int i=A.Length-1;i>1;i--){
+            if(A[i-1]+A[i-2]>A[i])return A[i]+A[i-1]+A[i-2];
+        }
+        return 0;
+    }
+    #region 交换数组两个元素
+    public static void swap(int[] nums,int he,int her){
+        nums[he]=nums[he]^nums[her];
+        nums[her]=nums[he]^nums[her];
+        nums[he]=nums[he]^nums[her];
+    }
+    public static void swap(List<int> nums,int he,int her){
+        nums[he]=nums[he]^nums[her];
+        nums[her]=nums[he]^nums[her];
+        nums[he]=nums[he]^nums[her];
+    }
+    #endregion
+    //冒泡排序
+    public void MaoPaoSort(int[] nums){
+        for(int i=0;i<nums.Length;i++){
+            bool isCompelted=true;
+            for(int l=0;l<nums.Length-1;l++)
+            {
+                if(nums[i]>nums[i+1]){
+                    swap(nums,i,i+1);
+                    isCompelted=false;
+                }
+            }
+            if(isCompelted)break;        
+        }
+    }
+    //插入排序
+    public void InsertSort(int[] nums){
+        int temp=0;
+        for(int i=0;i<nums.Length;i++){
+            temp = nums[i];
+            int l = i;
+            for (; l > 0 && nums[l - 1] > temp; l--)
+                nums[l] = nums[l - 1];
+            nums[l] = temp;
+        }
+    }
+    //希尔排序
+    public void ShellSort(int[] nums){
+        int[] Ds=GetI(nums.Length);
+        int temp=0;
+        int l = 0;
+        for(int k=Ds.Length-1;k>=0;k--){
+            int d=Ds[k];
+            for(int i=d;i<nums.Length;i++){
+                temp= nums[i];
+                for (l=i; l >= d && nums[l - d] > temp; l-=d)
+                    nums[l] = nums[l - d];
+                nums[l] = temp;
+            }
+        }
+    }
+    //堆排序
+    public void HeapSort(int[] nums){
+        Heap dic = new Heap();
+        for (int i = 0; i < nums.Length; i++)
+        {
+            dic.Insert(nums[i]);
+        }
+        for (int i = nums.Length-1; i >=0 ; i--)
+        {
+
+            nums[i] = dic.DeleteMax();
+        }
+    }
+    //希尔排序得到递增序列
+    public int[] GetI(int n){
+        List<int> res=new List<int>();
+        int d=1;
+        int i=1;
+        while(n>d){
+            res.Add(d);
+            i++;
+            d=pow(i)-1;
+        }
+        return res.ToArray();
+    }
+    //2的i次方
+    public int pow(int i){
+        int res=1;
+        int x=2;
+        while(i>0){
+            if((i&1)==1){
+                res*=x;
+            }
+            i>>=1;
+            x*=x;
+        }
+        return res;
+    }
+    //快速排序
+    public void QuickSort(int[] nums,int start,int end){
+        if(start>=end)return;
+        int temp=nums[start];
+        int i=start;
+        int j=end;
+        while(i<j){
+            while(i<j&&nums[j]>temp)
+                j--;
+            nums[i]=nums[j];
+            while(i<j&&nums[i]<=temp)
+                i++;
+            nums[j]=nums[i];
+        }
+        nums[i]=temp;
+        QuickSort(nums,start,i-1);
+        QuickSort(nums,i+1,end);
+    }
+    //归并排序
+    public void MergeSort(int[] nums,int[] tempNums,int L,int Rend){
+        int center;
+        if(L<Rend){
+            center=(Rend+L)/2;
+            MergeSort(nums,tempNums,L,center);
+            MergeSort(nums,tempNums,center+1,Rend);
+            Merge(nums,tempNums,L,center+1,Rend);
+        }
+    }
+    public void Merge(int[] nums,int[] tempNums ,int L,int R,int Rend){
+        int Lend=R-1;
+        int len=Rend-L+1;
+        int index=L;
+        while(L<=Lend&&R<=Rend){
+            if(nums[L]<nums[R])tempNums[index++]=nums[L++];
+            else tempNums[index++]=nums[R++];     
+        }
+        while(L<=Lend)
+            tempNums[index++]=nums[L++];
+        while(R<=Rend)
+            tempNums[index++]=nums[R++];
+        for(int i=0;i<len;i++,Rend--){
+            nums[Rend]=tempNums[Rend];
+        }
+    }
+    //桶排序
+    public void TongSort(int[] nums){
+        int max=0;
+        for(int i=0;i<nums.Length;i++){
+            if(nums[i]>max)max=nums[i];
+        }
+        int[] tong=new int[max+1];
+        for(int i=0;i<nums.Length;i++){
+            tong[nums[i]]++;
+        }
+        int index=0;
+        int tongIndex=1;
+        while(tongIndex<=max){
+            while(tong[tongIndex]!=0){
+                nums[index++]=tongIndex;
+                tong[tongIndex]--;
+            }
+            tongIndex++;
+        }
+    }
+}
+
+作者：dai-dai-dai-2
+链接：https://leetcode-cn.com/problems/largest-perimeter-triangle/solution/7chong-pai-xu-fang-fa-by-dai-dai-dai-2/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
 
