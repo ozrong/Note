@@ -68,6 +68,10 @@ Stream 的另外一大特点是，数据源本身可以是无限的
 
   
 
+# 贪心算法
+
+
+
 # Arrays
 
 ## Arrays.asList与Arrays.stream
@@ -90,6 +94,10 @@ Arrays.stream将数组转换成流
 Arrays.sort(int[] a)      这种形式是对一个数组的所有元素进行排序, 从小到大的顺序
 
 Arrays类的sort()方法是对一个数组进行排序的方法，sort()方法的参数是一个对象数组，也就是要排序的那个数组，**但是有些特别的是，这个对象数组中存储的对象的类必须实现了Comparable接口**
+
+## Arrays.toString
+
+这个是直接在原数值进行操作的，没有返回值。
 
 # java链表
 
@@ -398,7 +406,7 @@ class Solution {
 
 ```
 
-## [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/)
+## [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/)（没做）
 
 ## [1370. 上升下降字符串](https://leetcode-cn.com/problems/increasing-decreasing-string/)
 
@@ -1472,7 +1480,7 @@ class Solution {
 
 ### lambda
 
-## [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)（太难了）
+## [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/)（太难了）（没做起）
 
 绝对可以用递归
 
@@ -1608,6 +1616,74 @@ class Solution {
         return ans;
     }
 }
+```
+
+## [767. 重构字符串](https://leetcode-cn.com/problems/reorganize-string/)（有点难）（没做）
+
+## [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/)
+
+```java
+自己做的开心;
+//给定一个字符串数组，将字母异位词组合在一起。字母异位词指字母相同，但排列不同的字符串。 
+//
+// 示例: 
+//
+// 输入: ["eat", "tea", "tan", "ate", "nat", "bat"]
+//输出:
+//[
+//  ["ate","eat","tea"],
+//  ["nat","tan"],
+//  ["bat"]
+//] 
+//
+// 说明： 
+//
+// 
+// 所有输入均为小写字母。 
+// 不考虑答案输出的顺序。 
+// 
+// Related Topics 哈希表 字符串
+
+
+import java.lang.reflect.Array;
+import java.util.*;
+
+//leetcode submit region begin(Prohibit modification and deletion)
+就是使用HashMap 
+    2.每次判断排序后的字符串是不是HashMap的key，如果是就添加原字符串到key对应的value中（value就是一个List），否则就把排序后的字符串作为Key,再把原来的字符放进List里面做为value
+
+
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        int len = strs.length;
+        HashMap<String,List> hashMap = new HashMap<String, List>();
+        List<List<String>>  ans = new ArrayList<>();
+        for (int i = 0; i <len ; i++) {
+            List<String> temp = new ArrayList<>();
+            char[] temp_char = strs[i].toCharArray();
+            Arrays.sort(temp_char);
+            String temp_string = Arrays.toString(temp_char);
+            if (hashMap.get(temp_string) == null) {
+                temp.add(strs[i]);
+                hashMap.put(temp_string,temp);
+            } else {
+                hashMap.get(temp_string).add(strs[i]);
+            }
+        }
+       Iterator it =  hashMap.keySet().iterator();
+       while (it.hasNext()){
+           String key = (String)it.next();
+           List<String> value =hashMap.get(key);
+           ans.add(value);
+       }
+       return ans;
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+
+
+
 ```
 
 
