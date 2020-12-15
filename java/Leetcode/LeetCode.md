@@ -1,3 +1,61 @@
+# 为什么int数组就不可以直接输出而char数组就可以直接输出
+
+```java
+ char[] a = new char[]{'s','b'};
+  System.out.println(a); //sb
+
+
+ int[] b = new int[]{1,2,3,4,5};
+  System.out.println(b); //[I@1540e19d
+
+
+why？？？？（结果表明我们可以直接整体输出字符型数组和字符串，而无法整体输出整形数组(只能输出其地址)为什么会这样呢？？？？？？？？？？？？）
+    
+    打印的时候这两个println（）是不一样的。
+    打印Int数组使用的是：
+        public void println(Object x) {
+        String s = String.valueOf(x);
+        synchronized (this) {
+            print(s);
+            newLine();
+        }
+    }
+
+	打印char数组使用的是
+    public void println(char x[]) {
+        synchronized (this) {
+            print(x);
+            newLine();
+        }
+    }
+   
+   打印int数组多了一步操作  String s = String.valueOf(x);  字符数组得到的是一个字符串 而int数组得到的是地址变成的字符串
+    
+    
+    
+
+```
+
+
+
+# String 转 int
+
+1、String 转 int 方法1，使用Integer类中的parseInt（）方法。
+
+```java
+String str = "10";
+int number = Integer.parseInt(str)
+```
+
+2、String 转 int 方法2，使用Integer类中的valueOf()和intValue()方法
+
+```java
+String str = "10";
+ int a =Integer.valueOf(str).intValue()
+```
+
+**注意：String 转int要注意的是，因为可能字符串种存在非数字，因此要抛异常**
+
 # ArrayList
 
 **ArrayList只是一个存放对象的容器。所以可以存放重复的数据**
@@ -72,6 +130,36 @@ Stream 的另外一大特点是，数据源本身可以是无限的
 
 
 
+
+
+# String
+
+## toCharArray()
+
+```java
+这个函数是String类里面的，不是Arrays里面的
+public char[] toCharArray()  无参数，返回字符数组;
+
+把字符串变成字符数组   
+```
+
+##  基本数据型态转换成 String 的 static 方法( **String.valueOf()**)
+
+```java
+（1）String.valueOf(boolean b) : 将 boolean 变量 b 转换成字符串 
+（2）String.valueOf(char c) : 将 char 变量 c 转换成字符串 
+（3）String.valueOf(char[] data) : 将 char 数组 data 转换成字符串 
+（4）String.valueOf(char[] data, int offset, int count) : 将 char 数组 data 中 由 data[offset] 开始取 count 个元素 转换成字符串 
+
+（5）String.valueOf(double d) : 将 double 变量 d 转换成字符串 
+（6）String.valueOf(float f) : 将 float 变量 f 转换成字符串 
+（7）String.valueOf(int i) : 将 int 变量 i 转换成字符串 
+（8）String.valueOf(long l) : 将 long 变量 l 转换成字符串 
+（9）String.valueOf(Object obj) : 将 obj 对象转换成 字符串, 等于 obj.toString() 
+```
+
+
+
 # Arrays
 
 ## Arrays.asList与Arrays.stream
@@ -98,6 +186,77 @@ Arrays类的sort()方法是对一个数组进行排序的方法，sort()方法�
 ## Arrays.toString
 
 这个是直接在原数值进行操作的，没有返回值。
+
+这有个坑
+
+```java
+eg1: 
+		char[] a = new char[]{'0','1'}; 
+		String str = Arrays.toString(a);
+		System.out.println(str);  //[0, 1]
+
+eg2:
+        char[] a = new char[]{'s','b'};
+        String str = Arrays.toString(a);
+        System.out.println(str); //[s, b]
+toString 会添加"[]" ,并不是把数组给放在了一起变成“01”或者“sb”;
+
+想要达到这样的目的有两种方法：
+    方法一：
+    
+    遍历这个数组
+        String ans1 = "";
+        for (char c : a){
+            ans1 = ans1+c;
+        }
+   方法二：
+        String str = String.valueOf(a);
+      
+
+
+    
+
+```
+
+
+
+# Map接口
+
+## HashMap
+
+HashMap是[Map接口](https://www.baidu.com/s?wd=Map接口&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)的主要实现类
+
+### getOrDefault()
+
+当Map集合中有这个key时，就使用这个key值；
+如果没有就使用默认值defaultValue.
+
+```java
+eg:
+
+        Map<String,String> map = new HashMap<>();
+        map.put("one","1");
+        map.put("two","2");
+
+        String key = map.getOrDefault("one","hahha");
+        System.out.println(key);//1
+
+        String key2 = map.getOrDefault("three","yayaya"); //注意：这个key “three”和value “yayaya”都不会添加到Map中
+        System.out.println(key2);//yayaya
+
+		System.out.println(map);//{one=1, two=2}
+
+
+
+
+显然getOrDefault()是如果Map中有这个key则返回对应的值，如果没有则返回设置的默认值。
+注意的是：这个值并没有添加到Map中
+
+```
+
+
+
+
 
 # java链表
 
@@ -1679,6 +1838,67 @@ class Solution {
            ans.add(value);
        }
        return ans;
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+```
+
+
+
+## [738. 单调递增的数字](https://leetcode-cn.com/problems/monotone-increasing-digits/)
+
+
+
+```java
+//给定一个非负整数 N，找出小于或等于 N 的最大的整数，同时这个整数需要满足其各个位数上的数字是单调递增。 
+//
+// （当且仅当每个相邻位数上的数字 x 和 y 满足 x <= y 时，我们称这个整数是单调递增的。） 
+//
+// 示例 1: 
+//
+// 输入: N = 10
+//输出: 9
+// 
+//
+// 示例 2: 
+//
+// 输入: N = 1234
+//输出: 1234
+// 
+//
+// 示例 3: 
+//
+// 输入: N = 332
+//输出: 299
+// 
+//
+// 说明: N 是在 [0, 10^9] 范围内的一个整数。 
+// Related Topics 贪心算法
+
+
+思路：从后往前遍历，如果前面的值大于后面的值就把当前位数减一然后把后面所有位置的值变成9，以此类推
+
+import java.util.Arrays;
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public int monotoneIncreasingDigits(int N) {
+        char[]  temp = String.valueOf(N).toCharArray();
+        int len = temp.length;
+        for (int i = len-1; i >=1 ; i--) {
+            if (temp[i-1] > temp[i] ){
+                temp[i-1] = (char)(((int)temp[i-1])-1);
+                for (int j = i; j <len ; j++) {
+                    temp[j] = '9'
+                }
+            }
+        }
+        String ans1 =String.valueOf(temp);
+
+        int ans = Integer.valueOf(ans1).intValue();
+        return ans;
+
     }
 }
 //leetcode submit region end(Prohibit modification and deletion)
