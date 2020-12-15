@@ -1620,6 +1620,8 @@ class Solution {
 
 ## [767. 重构字符串](https://leetcode-cn.com/problems/reorganize-string/)（有点难）（没做）
 
+## [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/)（没做）
+
 ## [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/)
 
 ```java
@@ -1680,9 +1682,6 @@ class Solution {
     }
 }
 //leetcode submit region end(Prohibit modification and deletion)
-
-
-
 
 ```
 
