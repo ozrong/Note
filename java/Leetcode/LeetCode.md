@@ -38,23 +38,7 @@ why？？？？（结果表明我们可以直接整体输出字符型数组和�
 
 
 
-# String 转 int
 
-1、String 转 int 方法1，使用Integer类中的parseInt（）方法。
-
-```java
-String str = "10";
-int number = Integer.parseInt(str)
-```
-
-2、String 转 int 方法2，使用Integer类中的valueOf()和intValue()方法
-
-```java
-String str = "10";
- int a =Integer.valueOf(str).intValue()
-```
-
-**注意：String 转int要注意的是，因为可能字符串种存在非数字，因此要抛异常**
 
 # ArrayList
 
@@ -132,9 +116,39 @@ Stream 的另外一大特点是，数据源本身可以是无限的
 
 
 
-# String
+# String  (必须要熟悉String的方法)
 
-## toCharArray()
+## 1. charAt
+
+```
+public char charAt(int index)  返回指定位置的字符
+```
+
+## 2. StringBuffer
+
+StringBuffer ret = new StringBuffer();
+
+可以向python中列表一样添加字符
+
+```java
+StringBuffer ret = new StringBuffer();
+ret.append("ssss");
+ret.append('h');
+ret.append(2);
+StringBuffer kk = new StringBuffer("hahahahhahaha");
+ret.append(kk);
+System.out.println(ret.toString());
+
+"""
+    append() 可以添加很多东西，如下面的图 所有的应该都会转化为字符
+"""
+```
+
+
+
+![image-20201125203905318](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201125203905318.png)
+
+## 3.toCharArray()
 
 ```java
 这个函数是String类里面的，不是Arrays里面的
@@ -143,7 +157,7 @@ public char[] toCharArray()  无参数，返回字符数组;
 把字符串变成字符数组   
 ```
 
-##  基本数据型态转换成 String 的 static 方法( **String.valueOf()**)
+##  4.基本数据型态转换成 String 的 static 方法( **String.valueOf()**)
 
 ```java
 （1）String.valueOf(boolean b) : 将 boolean 变量 b 转换成字符串 
@@ -156,6 +170,32 @@ public char[] toCharArray()  无参数，返回字符数组;
 （7）String.valueOf(int i) : 将 int 变量 i 转换成字符串 
 （8）String.valueOf(long l) : 将 long 变量 l 转换成字符串 
 （9）String.valueOf(Object obj) : 将 obj 对象转换成 字符串, 等于 obj.toString() 
+```
+
+## 5.String 转 int
+
+1、String 转 int 方法1，使用Integer类中的parseInt（）方法。
+
+```java
+String str = "10";
+int number = Integer.parseInt(str)
+```
+
+2、String 转 int 方法2，使用Integer类中的valueOf()和intValue()方法
+
+```java
+String str = "10";
+ int a =Integer.valueOf(str).intValue()
+```
+
+**注意：String 转int要注意的是，因为可能字符串种存在非数字，因此要抛异常**
+
+## 6. 字符串的长度是可以直接得到的
+
+```java
+        String pattern = "sdsdsds";
+        System.out.println(pattern.length()); // 7
+
 ```
 
 
@@ -176,6 +216,27 @@ list.add("g");//报错
 ```
 
 Arrays.stream将数组转换成流
+
+
+
+**注意 **    Arrays.asList() 转换非基本类型的还可以，但是基本类型就不行
+
+```java
+eg:
+        String pattern = "sdsdsds";
+        char[] aa = pattern.toCharArray();
+        System.out.println(Arrays.asList(aa));//[[C@1540e19d] （地址）
+
+
+        int[] a = {1,2,3,4};
+        System.out.println(Arrays.asList(a));//[[I@677327b6]
+
+
+
+
+```
+
+
 
 ## Arrays.sort
 
@@ -280,37 +341,7 @@ head.next = frist; //这就连接起来了
 
 
 
-# 字符串
 
-## 1. charAt
-
-```
-public char charAt(int index)  返回指定位置的字符
-```
-
-## 2. StringBuffer
-
-StringBuffer ret = new StringBuffer();
-
-可以向python中列表一样添加字符
-
-```java
-StringBuffer ret = new StringBuffer();
-ret.append("ssss");
-ret.append('h');
-ret.append(2);
-StringBuffer kk = new StringBuffer("hahahahhahaha");
-ret.append(kk);
-System.out.println(ret.toString());
-
-"""
-    append() 可以添加很多东西，如下面的图 所有的应该都会转化为字符
-"""
-```
-
-
-
-![image-20201125203905318](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20201125203905318.png)
 
 # 简单--------
 
@@ -1019,7 +1050,96 @@ public class Solution {
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
+## [290. 单词规律](https://leetcode-cn.com/problems/word-pattern/)(不简单哦)
 
+```java
+//给定一种规律 pattern 和一个字符串 str ，判断 str 是否遵循相同的规律。 
+//
+// 这里的 遵循 指完全匹配，例如， pattern 里的每个字母和字符串 str 中的每个非空单词之间存在着双向连接的对应规律。 
+//
+// 示例1: 
+//
+// 输入: pattern = "abba", str = "dog cat cat dog"
+//输出: true 
+//
+// 示例 2: 
+//
+// 输入:pattern = "abba", str = "dog cat cat fish"
+//输出: false 
+//
+// 示例 3: 
+//
+// 输入: pattern = "aaaa", str = "dog cat cat dog"
+//输出: false 
+//
+// 示例 4: 
+//
+// 输入: pattern = "abba", str = "dog dog dog dog"
+//输出: false 
+//
+// 说明: 
+//你可以假设 pattern 只包含小写字母， str 包含了由单个空格分隔的小写字母。 
+// Related Topics 哈希表
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+
+//leetcode submit region begin(Prohibit modification and deletion)
+class Solution {
+    public boolean wordPattern(String pattern, String s) {
+        HashMap<Character,HashSet<String>> map = new HashMap<>();
+
+        char[] pattern_array =pattern.toCharArray();   这个其实可以使用pattern.charAt()就可以了不一定要转成char[]
+        String[]  s_array = s.split(" ");
+
+        int len_pattern = pattern_array.length;
+        int len_s = s_array.length;
+        if(len_pattern!=len_s) return false;
+
+        String[] str = new String[len_pattern];
+
+        for (int i = 0; i <len_pattern ; i++) {          这儿是将char[]转为String[]
+            str[i] =String.valueOf(pattern_array[i]);
+        }
+        HashSet<String> set2 = new HashSet(Arrays.asList(s_array));
+        HashSet<String> set1 = new HashSet(Arrays.asList(str));
+        System.out.println(set1);
+        System.out.println(set2);
+        if(set1.size() != set2.size())return false; 因为一个字母对应  一个字符串  如果他们的去掉重复的字符或者字符喜串得到的集合的大小不一样                                                     显然是不能满足题目条件的
+
+        for (int i = 0; i <len_pattern ; i++) {
+            HashSet<String> set = map.getOrDefault(pattern_array[i],new HashSet<String>());
+            Boolean isempty = !set.isEmpty();
+            Boolean flag =  set.add(s_array[i]);
+            if (flag && isempty){
+                return false;
+            }
+            map.put(pattern_array[i],set);
+        }
+        return true;
+    }
+}
+//leetcode submit region end(Prohibit modification and deletion)
+
+
+
+
+
+```
+
+
+
+以下这种和我自己的一样的想法，不过他这个更加的简洁
+
+第一种：HashMap + HashSet,这里简单说一下
+1：判断字符串pattern与s的长度是否相等，不等则返回false；
+2：接下来遍历pattern，用pattern的单个字符做为map的key，s的单个单词作为map的value；这样只处理了pattern到s的映射，abba，dog dog dog dog这种无法满足；
+3：因此我们用一个set来存储s的单词，保证每个单词对应的pattern的字符也是唯一的；该步骤也可用上面2步骤重复一遍解决，把pattern跟s调换位置后从新调用方法即可；
+
+![https://pic.leetcode-cn.com/1608085362-JFrIrV-1608083704(1).jpg](https://pic.leetcode-cn.com/1608085362-JFrIrV-1608083704(1).jpg)
 
 # 中等--------
 
