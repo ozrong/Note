@@ -1,0 +1,6 @@
+#说明
+Customer这个类就对应的一个数据表 
+DAO类是包含了数据库常用一些操作，
+CostomerDAO类继承了DAO，并且包含了customer这个表特定的一些操作
+
+TestDAO类就是一个需要使用数据库的一个类

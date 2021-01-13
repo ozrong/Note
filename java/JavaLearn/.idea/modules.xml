@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Collection/A.iml" filepath="$PROJECT_DIR$/Collection/A.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Annotation/Annotation.iml" filepath="$PROJECT_DIR$/Annotation/Annotation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Collection/Collection.iml" filepath="$PROJECT_DIR$/Collection/Collection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ComToolClass/ComToolClass.iml" filepath="$PROJECT_DIR$/ComToolClass/ComToolClass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CommonClass/CommonClass.iml" filepath="$PROJECT_DIR$/CommonClass/CommonClass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EnumerationClass/EnumerationClass.iml" filepath="$PROJECT_DIR$/EnumerationClass/EnumerationClass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Exception_handing/Exception_handing.iml" filepath="$PROJECT_DIR$/Exception_handing/Exception_handing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Genericity/Genericity.iml" filepath="$PROJECT_DIR$/Genericity/Genericity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IO/IO.iml" filepath="$PROJECT_DIR$/IO/IO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/InterfaceTest/InterfaceTest.iml" filepath="$PROJECT_DIR$/InterfaceTest/InterfaceTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JavaLearn.iml" filepath="$PROJECT_DIR$/JavaLearn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MultithreadLearn/MultithreadLearn.iml" filepath="$PROJECT_DIR$/MultithreadLearn/MultithreadLearn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ObjectAndSubobject/ObjectAndSubobject.iml" filepath="$PROJECT_DIR$/ObjectAndSubobject/ObjectAndSubobject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Test/Test.iml" filepath="$PROJECT_DIR$/Test/Test.iml" />
+    </modules>
+  </component>
+</project>
