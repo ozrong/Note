@@ -1,5 +1,6 @@
 package com.ozr.java1;
 
+import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
 import org.junit.Test;
 
 import java.io.*;
@@ -210,6 +211,48 @@ public class FileReaderWriterTest {
             //4.关闭流
             try {
                 out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+    @Test
+    public void test6(){
+        FileReader fr = null;
+        FileWriter fw = null;
+
+        try {
+            //1.创建File类的对象，指明读入和写出的文件
+            File srcfile = new File("hello.txt");
+            File desFile = new File("helo.txt");
+
+            //2.创建输入流和输出流的对象
+             fr = new FileReader(srcfile);
+             fw = new FileWriter(desFile);
+
+
+            //3.数据的读入和写出操作
+            char[] cbuf = new char[5];
+            int len;
+            while((len = fr.read(cbuf)) != -1){
+                //每次读到len个字符，写入len个字符
+                fw.write(cbuf,0,len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //4.关闭流资源
+            try {
+                fr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //即使在上面的try-catch出现异常了的话  下面的try-catch也是会执行的
+            try {
+                fw.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
