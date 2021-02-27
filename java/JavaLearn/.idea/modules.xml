@@ -11,10 +11,12 @@
       <module fileurl="file://$PROJECT_DIR$/Exception_handing/Exception_handing.iml" filepath="$PROJECT_DIR$/Exception_handing/Exception_handing.iml" />
       <module fileurl="file://$PROJECT_DIR$/Genericity/Genericity.iml" filepath="$PROJECT_DIR$/Genericity/Genericity.iml" />
       <module fileurl="file://$PROJECT_DIR$/IO/IO.iml" filepath="$PROJECT_DIR$/IO/IO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IOandNet/IOandNet.iml" filepath="$PROJECT_DIR$/IOandNet/IOandNet.iml" />
       <module fileurl="file://$PROJECT_DIR$/InterfaceTest/InterfaceTest.iml" filepath="$PROJECT_DIR$/InterfaceTest/InterfaceTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/JavaLearn.iml" filepath="$PROJECT_DIR$/JavaLearn.iml" />
       <module fileurl="file://$PROJECT_DIR$/MultithreadLearn/MultithreadLearn.iml" filepath="$PROJECT_DIR$/MultithreadLearn/MultithreadLearn.iml" />
       <module fileurl="file://$PROJECT_DIR$/ObjectAndSubobject/ObjectAndSubobject.iml" filepath="$PROJECT_DIR$/ObjectAndSubobject/ObjectAndSubobject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Reflection_Mechanism/Reflection_Mechanism.iml" filepath="$PROJECT_DIR$/Reflection_Mechanism/Reflection_Mechanism.iml" />
       <module fileurl="file://$PROJECT_DIR$/Test/Test.iml" filepath="$PROJECT_DIR$/Test/Test.iml" />
     </modules>
   </component>

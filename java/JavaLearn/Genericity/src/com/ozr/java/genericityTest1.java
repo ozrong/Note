@@ -2,7 +2,6 @@ package com.ozr.java;
 
 import org.junit.Test;
 
-import java.awt.print.PrinterGraphics;
 import java.util.List;
 
 /**
